@@ -1,0 +1,23 @@
+<?php
+
+namespace App\Http\Requests\Member;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class RegisterRequest extends FormRequest
+{
+    public function authorize()
+    {
+        return true;
+    }
+
+    public function rules()
+    {
+        return [
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|unique:users,email',
+            'password' => 'required|min:6|confirmed',
+            'avatar'   => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ];
+    }
+}

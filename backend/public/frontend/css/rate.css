@@ -1,0 +1,29 @@
+.rate .ratings_stars {
+    height: 15px;
+    width: 16px;
+    background: url(../images/200/start2.png) no-repeat;
+    background-size: 16px;
+    float: left;
+    margin-right: 4px;
+
+    cursor: pointer;            /* 🔥 */
+    user-select: none;          /* 🔥 */
+    display: inline-block;      /* 🔥 */
+}
+
+/* ⭐ SAO ĐƯỢC CHỌN */
+.rate .ratings_stars.active {
+    background: url(../images/200/start-active2.png) no-repeat;
+    background-size: 16px;
+}
+
+/* hover */
+.rate .ratings_stars:hover {
+    background: url(../images/200/start-hover2.png) no-repeat;
+    background-size: 16px;
+}
+
+/* ẩn dấu ★ */
+.rate .ratings_stars {
+    color: transparent;
+}

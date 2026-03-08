@@ -33,7 +33,8 @@ const Login = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost/laravel8/laravel8/public/api/login",
+        "http://shoppe.test/api/login",
+        // http://shoppe.test/api/login
         form
       );
 

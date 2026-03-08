@@ -71,7 +71,8 @@ const Register = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost/laravel8/laravel8/public/api/register",
+        "http://shoppe.test/api/register",
+        // http://localhost/laravel8/laravel8/public/api/register
         payload,
         { headers: { "Content-Type": "application/json" } }
       );

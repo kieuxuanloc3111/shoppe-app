@@ -4,45 +4,61 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Member\LoginRequest;
-use App\Http\Requests\Member\RegisterRequest;
+use App\Http\Requests\Api\AuthRequest;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
-
+// use Intervention\Image\Facades\Image;
 class AuthController extends Controller
 {
     public $successStatus = 200;
-    public function register(RegisterRequest $request)
+
+    public function register(AuthRequest $request)
     {
-        $avatarPath = null;
+        $data = $request->all();
 
-        if ($request->hasFile('avatar')) {
+        $avatarName = null;
 
-            $file = $request->file('avatar');
+        if (!empty($data['avatar']) && strpos($data['avatar'], 'base64,')) {
 
-            $fileName = time().'_'.$file->getClientOriginalName();
+            // tách header và data
+            [$meta, $content] = explode(',', $data['avatar']);
 
-            $file->move(public_path('uploads/avatars'), $fileName);
+            // lấy extension
+            preg_match('/data:image\/(\w+);base64/', $meta, $matches);
+            $extension = $matches[1] ?? 'png';
 
-            $avatarPath = 'uploads/avatars/' . $fileName;
+            $avatarName = time().'.'.$extension;
+
+            // decode base64
+            $imageData = base64_decode($content);
+
+            // đảm bảo folder tồn tại
+            $path = public_path('uploads/avatars');
+            if (!file_exists($path)) {
+                mkdir($path, 0777, true);
+            }
+
+            // lưu file
+            file_put_contents($path.'/'.$avatarName, $imageData);
         }
 
         $user = User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'password' => Hash::make($request->password),
-            'avatar'   => $avatarPath,
-            'level'    => 0,
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+            'phone' => $data['phone'] ?? null,
+            'address' => $data['address'] ?? null,
+            'level' => 0,
+            'avatar' => $avatarName
         ]);
-
-        $token = $user->createToken('authToken')->plainTextToken;
 
         return response()->json([
             'message' => 'success',
-            'token'   => $token,
-            'Auth'    => $user
-        ], $this->successStatus);
+            'Auth' => $user
+        ]);
     }
     public function login(LoginRequest $request)
     {

@@ -17,7 +17,9 @@ const Home = () => {
     const fetchProduct = async () => {
       try {
         const res = await axios.get(
-          "http://localhost/laravel8/laravel8/public/api/product"
+          "http://shoppe.test/api/product"
+          
+          // http://localhost/laravel8/laravel8/public/api/product
         );
         setProducts(res.data.data);
       } catch (err) {
@@ -57,12 +59,13 @@ const Home = () => {
       imgArray = [];
     }
     const firstImage = imgArray[0];
-    return (
-      "http://localhost/laravel8/laravel8/public/upload/product/" +
-      item.id_user +
-      "/" +
-      firstImage
-    );
+    return "http://shoppe.test/upload/product/" + firstImage;
+    // return (
+    //   "http://localhost/laravel8/laravel8/public/upload/product/" +
+    //   item.id_user +
+    //   "/" +
+    //   firstImage
+    // );
   };
 
   return (

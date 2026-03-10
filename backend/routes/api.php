@@ -12,6 +12,9 @@ Route::get('/category-brand', [ProductController::class, 'categoryBrand']);
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/user/update/{id}',[MemberController::class, 'updateProfile']);
     Route::post('/user/product/add', [ProductController::class, 'addProduct']);
+    Route::get('/user/my-product', [ProductController::class, 'myProduct']);
+
+    Route::get('/user/product/delete/{id}', [ProductController::class, 'deleteProduct']);
 });
 
 Route::get('/product', [ProductController::class, 'product']);

@@ -7,6 +7,7 @@ use App\Models\Products;
 use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Brand;
+use Illuminate\Support\Facades\Auth;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
 class ProductController extends Controller
@@ -76,5 +77,52 @@ class ProductController extends Controller
             'response' => 'success',
             'data' => $product
         ]);
+    }
+    public function myProduct()
+    {
+        $user = Auth::user();
+
+        $getProduct = Products::where('user_id', $user->id)
+            ->orderBy('id', 'desc')
+            ->get();
+
+        return response()->json([
+            'response' => 'success',
+            'data' => $getProduct
+        ], $this->successStatus);
+    }
+    public function deleteProduct($id)
+    {
+        $user = Auth::user();
+
+        $product = Products::findOrFail($id);
+
+        // bảo mật: chỉ xóa sản phẩm của mình
+        if ($product->user_id != $user->id) {
+            return response()->json([
+                'response' => 'error',
+                'message' => 'Permission denied'
+            ], 403);
+        }
+
+        // xóa ảnh
+        $images = json_decode($product->image, true);
+
+        if ($images) {
+            foreach ($images as $img) {
+
+                $path = public_path('upload/product/'.$img);
+
+                if (file_exists($path)) {
+                    unlink($path);
+                }
+            }
+        }
+
+        $product->delete();
+
+        return response()->json([
+            'response' => 'success'
+        ], $this->successStatus);
     }
 }

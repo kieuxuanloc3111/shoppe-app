@@ -19,7 +19,8 @@ const ProductDetail = () => {
       try {
         // API lấy chi tiết sản phẩm
         const res = await axios.get(
-          `http://localhost/laravel8/laravel8/public/api/product/detail/${id}`
+          `http://shoppe.test/api/product/detail/${id}`
+          // http://localhost/laravel8/laravel8/public/api/product/detail/${id}
         );
 
         const data = res.data.data;
@@ -36,13 +37,15 @@ const ProductDetail = () => {
 
         if (imgArr.length > 0) {
           setMainImage(
-            `http://localhost/laravel8/laravel8/public/upload/product/${data.id_user}/${imgArr[0]}`
+            `http://shoppe.test/upload/product/${imgArr[0]}`
+            // http://localhost/laravel8/laravel8/public/upload/product/${data.id_user}/${imgArr[0]}
           );
         }
 
         // API category + brand
         const cateBrand = await axios.get(
-          "http://localhost/laravel8/laravel8/public/api/category-brand"
+          "http://shoppe.test/api/category-brand"
+          // http://localhost/laravel8/laravel8/public/api/category-brand
         );
 
         const cate = cateBrand.data.category.find(
@@ -66,7 +69,8 @@ const ProductDetail = () => {
 
   // Build image URL for thumbnails
   const getImgUrl = (filename) => {
-    return `http://localhost/laravel8/laravel8/public/upload/product/${product.id_user}/${filename}`;
+    return `http://shoppe.test/upload/product/${filename}`;
+    // http://localhost/laravel8/laravel8/public/upload/product/${product.id_user}/${filename}
   };
 
   return (
@@ -136,7 +140,7 @@ const ProductDetail = () => {
             {/* SALE */}
             {product.sale && (
               <p style={{ fontWeight: "bold", color: "red" }}>
-                Sale: {product.sale}
+                Sale: {product.sale_price}
               </p>
             )}
 

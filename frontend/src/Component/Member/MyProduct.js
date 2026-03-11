@@ -10,7 +10,9 @@ const MyProduct = () => {
         const token = localStorage.getItem("token");
 
         const res = await axios.get(
-          "http://localhost/laravel8/laravel8/public/api/user/my-product",
+          "http://shoppe.test/api/user/my-product",
+          
+          // http://localhost/laravel8/laravel8/public/api/user/my-product
           {
             headers: { Authorization: "Bearer " + token }
           }
@@ -40,7 +42,8 @@ const MyProduct = () => {
 
     try {
       const res = await axios.get(
-        `http://localhost/laravel8/laravel8/public/api/user/product/delete/${idProduct}`,
+        `http://shoppe.test/api/user/product/delete/${idProduct}`,
+        // http://localhost/laravel8/laravel8/public/api/user/product/delete/${idProduct}
         {
           headers: {
             Authorization: "Bearer " + token,
@@ -84,11 +87,7 @@ const MyProduct = () => {
               }
 
               const firstImage = imgArray[0];
-              const imageUrl =
-                "http://localhost/laravel8/laravel8/public/upload/product/" +
-                item.id_user +
-                "/" +
-                firstImage;
+              const imageUrl = `http://shoppe.test/upload/product/${firstImage}`;
 
               return (
                 <tr key={item.id}>

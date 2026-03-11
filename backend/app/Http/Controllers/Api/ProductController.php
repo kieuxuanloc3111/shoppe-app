@@ -125,4 +125,35 @@ class ProductController extends Controller
             'response' => 'success'
         ], $this->successStatus);
     }
+    public function detail($id)
+    {
+        $product = Products::find($id);
+
+        if (!$product) {
+            return response()->json([
+                'response' => 'error',
+                'message' => 'Product not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'response' => 'success',
+            'data' => $product
+        ], $this->successStatus);
+    }
+    public function productCart(Request $request) {
+        
+        $data = $request->json()->all();
+        
+        $getProduct = [];
+        foreach ($data as $key => $value) {
+            $get = Products::findOrFail($key)->toArray();
+            $get['qty'] = $value;
+            $getProduct[] = $get;
+        }
+        return response()->json([
+            'response' => 'success',
+            'data' => $getProduct
+        ], $this->successStatus);
+    }
 }

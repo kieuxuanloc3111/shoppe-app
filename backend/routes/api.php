@@ -18,4 +18,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 });
 
 Route::get('/product', [ProductController::class, 'product']);
+Route::get('/product/detail/{id}', [ProductController::class, 'detail']);
+Route::post('/product/cart',[ProductController::class, 'productCart']);
 ?>

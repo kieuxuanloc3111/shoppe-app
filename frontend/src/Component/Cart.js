@@ -32,7 +32,8 @@ const Cart = () => {
 
       try {
         const res = await axios.post(
-          "http://localhost/laravel8/laravel8/public/api/product/cart",
+          "http://shoppe.test/api/product/cart",
+          // http://localhost/laravel8/laravel8/public/api/product/cart
           cart,
           { headers: { "Content-Type": "application/json" } }
         );
@@ -57,7 +58,8 @@ const Cart = () => {
       arr = [];
     }
     const first = arr[0];
-    return `http://localhost/laravel8/laravel8/public/upload/product/${item.id_user}/${first}`;
+    return "http://shoppe.test/upload/product/" + first;
+    // http://localhost/laravel8/laravel8/public/upload/product/${item.id_user}/${first}
   };
 
   return (

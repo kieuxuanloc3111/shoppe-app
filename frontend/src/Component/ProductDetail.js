@@ -48,11 +48,17 @@ const ProductDetail = () => {
           // http://localhost/laravel8/laravel8/public/api/category-brand
         );
 
-        const cate = cateBrand.data.category.find(
-          (c) => c.id === Number(data.id_category)
+        const categories = cateBrand.data.category;
+        const brands = cateBrand.data.brand;
+
+        // tìm category
+        const cate = categories.find(
+          (item) => Number(item.id) === Number(data.category_id)
         );
-        const brand = cateBrand.data.brand.find(
-          (b) => b.id === Number(data.id_brand)
+
+        // tìm brand
+        const brand = brands.find(
+          (item) => Number(item.id) === Number(data.brand_id)
         );
 
         setCategoryName(cate ? cate.category : "");
@@ -157,7 +163,7 @@ const ProductDetail = () => {
             </p>
 
             <p>
-              <b>Company:</b> {product.company_profile}
+              <b>Company:</b> {product.company}
             </p>
           </div>
         </div>

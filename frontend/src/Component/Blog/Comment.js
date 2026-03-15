@@ -25,8 +25,9 @@ const Comment = ({ idBlog, parentId = 0, onAddComment, onCancelReply }) => {
     setError("");
 
     const url =
-      "http://localhost/laravel8/laravel8/public/api/blog/comment/" + idBlog;
-
+    
+      "http://shoppe.test/api/blog/comment/" + idBlog;
+// "http://localhost/laravel8/laravel8/public/api/blog/comment/"
     const formData = new FormData();
     formData.append("id_blog", idBlog);
     formData.append("id_user", user.id);

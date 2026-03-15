@@ -18,13 +18,21 @@ const Blog_detail = () => {
     const fetchDetail = async () => {
       try {
         const res = await axios.get(
-          `http://localhost/laravel8/laravel8/public/api/blog/detail/${params.id}`
+          
+          `http://shoppe.test/api/blog/detail/${params.id}`
+          // http://localhost/laravel8/laravel8/public/api/blog/detail/${params.id}
         );
 
         setData(res.data.data);
 
-        const apiComments = res.data.data.comment;
-        setComments(Array.isArray(apiComments) ? apiComments : []);
+        // const apiComments = res.data.data.comment;
+        // setComments(Array.isArray(apiComments) ? apiComments : []);
+        // console.log(comments);
+        const commentRes = await axios.get(
+          `http://shoppe.test/api/blog/comment/${params.id}`
+        );
+
+        setComments(commentRes.data.data);
       } catch (err) {
         console.log(err);
         setComments([]);
@@ -63,7 +71,7 @@ const Blog_detail = () => {
                 <div className="post-meta">
                   <ul>
                     <li>
-                      <i className="fa fa-user" /> Author ID: {data.id_auth}
+                      <i className="fa fa-user" /> Author ID: {data.id}
                     </li>
                     <li>
                       <i className="fa fa-calendar" /> {data.created_at}
@@ -72,11 +80,13 @@ const Blog_detail = () => {
                 </div>
 
                 <img
-                  src={`http://localhost/laravel8/laravel8/public/upload/Blog/image/${data.image}`}
+                  src={`http://shoppe.test/${data.image}`}
+                  // http://localhost/laravel8/laravel8/public/upload/Blog/image/${data.image
                   alt=""
                 />
 
-                <p>{data.description}</p>
+                {/* <p>{data.description}</p> */}
+                <div dangerouslySetInnerHTML={{ __html: data.description }} />
 
                 <div
                   dangerouslySetInnerHTML={{ __html: data.content }}

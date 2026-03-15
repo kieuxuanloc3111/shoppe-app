@@ -8,7 +8,7 @@ const Blog = () => {
     const fetchBlogs = async () => {
       try {
         const res = await axios.get(
-          "http://localhost/laravel8/laravel8/public/api/blog"
+          "http://shoppe.test/api/blog"
         );
         setBlogs(res.data.blog.data); 
       } catch (error) {
@@ -42,12 +42,16 @@ const Blog = () => {
 
                     <a href="">
                       <img
-                        src={`http://localhost/laravel8/laravel8/public/upload/blog/image/${item.image}`}
+                        src={`http://shoppe.test/${item.image}`}
+                        // http://localhost/laravel8/laravel8/public/upload/blog/image/${item.image}
                         alt={item.title}
+                          style={{ width: "40%", height:"40%"}}
                       />
                     </a>
 
-                    <p>{item.description}</p>
+                    <div
+                      dangerouslySetInnerHTML={{ __html: item.description }}
+                    />
 
                     <Link to={`/blog_detail/${item.id}`}>Read more</Link>
                   </div>

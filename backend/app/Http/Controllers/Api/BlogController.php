@@ -29,9 +29,16 @@ class BlogController extends Controller
         ], 404);
         }
 
+        $prevBlog = Blog::where('id' , '<' , $id) 
+                        ->orderBy('id', 'desc')->first();
+        $nextBlog = Blog::where('id' , '>' , $id) 
+                        ->orderBy('id', 'asc')->first();
+
         return response()->json([
             'response' => 'success',
-            'data' => $blog
+            'data' => $blog,
+            'prev' => $prevBlog,
+            'next' => $nextBlog
         ], $this->successStatus);
     }
     public function getComment($id)

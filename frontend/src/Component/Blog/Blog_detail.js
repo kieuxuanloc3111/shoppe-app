@@ -14,6 +14,9 @@ const Blog_detail = () => {
 
   const [replyTarget, setReplyTarget] = useState(null);
 
+  const [prevBlog,setPrevBlog] = useState(null);
+  const [nextBlog,setNextBlog] = useState(null);
+
   useEffect(() => {
     const fetchDetail = async () => {
       try {
@@ -24,7 +27,8 @@ const Blog_detail = () => {
         );
 
         setData(res.data.data);
-
+        setPrevBlog(res.data.prev);
+        setNextBlog(res.data.next);
         // const apiComments = res.data.data.comment;
         // setComments(Array.isArray(apiComments) ? apiComments : []);
         // console.log(comments);
@@ -93,7 +97,27 @@ const Blog_detail = () => {
                 ></div>
               </div>
             </div>
+            <div className="pager-area">
+              <ul className="pager pull-right">
 
+                {prevBlog && (
+                  <li>
+                    <a href={`/blog_detail/${prevBlog.id}`}>
+                      ← Pre
+                    </a>
+                  </li>
+                )}
+
+                {nextBlog && (
+                  <li>
+                    <a href={`/blog_detail/${nextBlog.id}`}>
+                      Next →
+                    </a>
+                  </li>
+                )}
+
+              </ul>
+            </div>
             {/* rate  */}
             <Rate idBlog={params.id} />
 

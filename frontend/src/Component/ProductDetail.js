@@ -13,69 +13,41 @@ const ProductDetail = () => {
 
   // Modal Zoom
   const [showZoom, setShowZoom] = useState(false);
-  const getImgUrl = (filename) => {
-    return `http://localhost:8080/upload/product/${filename}`;
-  };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         // API lấy chi tiết sản phẩm
         const res = await axios.get(
-          `http://localhost:8080/api/product/detail/${id}`
-          // `http://shoppe.test/api/product/detail/${id}`
+          `http://shoppe.test/api/product/detail/${id}`
           // http://localhost/laravel8/laravel8/public/api/product/detail/${id}
         );
 
         const data = res.data.data;
         setProduct(data);
 
+        // parse ảnh
         let imgArr = [];
-
-        if (typeof data.image === "string") {
-          try {
-            let parsed = JSON.parse(data.image);
-
-            // 🔥 nếu vẫn là string → parse lần nữa
-            if (typeof parsed === "string") {
-              parsed = JSON.parse(parsed);
-            }
-
-            if (Array.isArray(parsed)) {
-              imgArr = parsed;
-            } else {
-              imgArr = [parsed];
-            }
-          } catch (e) {
-            console.log("PARSE ERROR:", e);
-            imgArr = [];
-          }
-        } else if (Array.isArray(data.image)) {
-          imgArr = data.image;
+        try {
+          imgArr = JSON.parse(data.image);
+        } catch {
+          imgArr = [];
         }
-
         setImages(imgArr);
 
-        setImages(imgArr);
-        console.log("IMAGE RAW:", data.image);
-        console.log("IMAGE AFTER:", imgArr);
-        
         if (imgArr.length > 0) {
           setMainImage(
-            getImgUrl(imgArr[0])
-            // `http://shoppe.test/upload/product/${imgArr[0]}`
+            `http://shoppe.test/upload/product/${imgArr[0]}`
             // http://localhost/laravel8/laravel8/public/upload/product/${data.id_user}/${imgArr[0]}
           );
         }
 
         // API category + brand
         const cateBrand = await axios.get(
-          "http://localhost:8080/api/category-brand"
-          // "http://shoppe.test/api/category-brand"
+          "http://shoppe.test/api/category-brand"
           // http://localhost/laravel8/laravel8/public/api/category-brand
         );
-        console.log(getImgUrl(imgArr[0]));
-        console.log("FIRST:", images[0]);
+
         const categories = cateBrand.data.category;
         const brands = cateBrand.data.brand;
 
@@ -102,11 +74,10 @@ const ProductDetail = () => {
   if (!product) return <p>Loading...</p>;
 
   // Build image URL for thumbnails
-  // const getImgUrl = (filename) => {
-  //   return `http://localhost:8080/uploads/product/${filename}`;
-  //   // return `http://shoppe.test/upload/product/${filename}`;
-  //   // http://localhost/laravel8/laravel8/public/upload/product/${product.id_user}/${filename}
-  // };
+  const getImgUrl = (filename) => {
+    return `http://shoppe.test/upload/product/${filename}`;
+    // http://localhost/laravel8/laravel8/public/upload/product/${product.id_user}/${filename}
+  };
 
   return (
     <div className="col-sm-9 padding-right">
@@ -140,8 +111,7 @@ const ProductDetail = () => {
           >
             <div className="carousel-inner">
               <div className="item active" style={{ display: "flex", gap: 10 }}>
-                {Array.isArray(images) &&
-                    images.slice(0, 3).map((img, index) => (
+                {images.slice(0, 3).map((img, index) => (
                   <img
                     key={index}
                     src={getImgUrl(img)}

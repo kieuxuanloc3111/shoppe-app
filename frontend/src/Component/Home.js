@@ -17,7 +17,8 @@ const Home = () => {
     const fetchProduct = async () => {
       try {
         const res = await axios.get(
-          "http://shoppe.test/api/product"
+          "http://localhost:8080/api/product"
+          // "http://shoppe.test/api/product"
           
           // http://localhost/laravel8/laravel8/public/api/product
         );
@@ -51,21 +52,70 @@ const Home = () => {
     wishlistIds.includes(p.id)
   );
 
+  // const buildImageUrl = (item) => {
+  //   let imgArray = [];
+  //   try {
+  //     imgArray = JSON.parse(item.image);
+  //   } catch {
+  //     imgArray = [];
+  //   }
+  //   const firstImage = imgArray[0];
+  //   return "http://shoppe.test/upload/product/" + firstImage;
+  //   // "http://shoppe.test/upload/product/" + firstImage;
+  //   // return (
+  //   //   "http://localhost/laravel8/laravel8/public/upload/product/" +
+  //   //   item.id_user +
+  //   //   "/" +
+  //   //   firstImage
+  //   // );
+  // }
   const buildImageUrl = (item) => {
-    let imgArray = [];
+    console.log("Raw image from API:", item.image);
+
+    let firstImage = "";
+
     try {
-      imgArray = JSON.parse(item.image);
-    } catch {
-      imgArray = [];
+      let raw = item.image;
+
+      if (typeof raw !== "string") {
+        raw = JSON.stringify(raw); // chuyển về string để xử lý
+      }
+
+      raw = raw.replace(/\\"/g, '"')           
+              .replace(/^"|"$/g, '')       
+              .trim();
+
+      console.log("🔧 Sau khi clean:", raw);
+
+      // Parse JSON array
+      const imgArray = JSON.parse(raw);
+
+      firstImage = Array.isArray(imgArray) && imgArray.length > 0 
+                  ? imgArray[0] 
+                  : "";
+
+    } catch (err) {
+      console.error("❌ Parse error:", err);
+
+      const match = String(item.image).match(/[^"\\[\]]+\.jpg|png|webp|jpeg/i);
+      if (match) {
+        firstImage = match[0];
+      } else {
+        firstImage = "";
+      }
     }
-    const firstImage = imgArray[0];
-    return "http://shoppe.test/upload/product/" + firstImage;
-    // return (
-    //   "http://localhost/laravel8/laravel8/public/upload/product/" +
-    //   item.id_user +
-    //   "/" +
-    //   firstImage
-    // );
+
+    if (!firstImage) {
+      console.warn("⚠️ Không tìm thấy ảnh cho:", item.name);
+      return "https://via.placeholder.com/300x250?text=No+Image";
+    }
+
+    firstImage = firstImage.replace(/^"|"$/g, '').trim();
+
+    const finalUrl = `http://localhost:8080/upload/product/${firstImage}`;
+    console.log("✅ Final image URL:", finalUrl);
+
+    return finalUrl;
   };
 
   return (

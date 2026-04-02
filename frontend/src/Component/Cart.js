@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { increaseQty, decreaseQty, removeItem } from "../Redux/cartSlice";
-
+import { Link } from "react-router-dom";
 const Cart = () => {
   const dispatch = useDispatch();
   const { cart } = useSelector((state) => state.cart); // { id: qty, ... }
@@ -33,14 +33,17 @@ const Cart = () => {
       try {
         const res = await axios.post(
           "http://shoppe.test/api/product/cart",
-          // http://localhost/laravel8/laravel8/public/api/product/cart
-          cart,
-          { headers: { "Content-Type": "application/json" } }
+          {
+            cart: cart
+          }
         );
 
         const items = res.data.data || [];
+
         setCartItems(items);
         updateTotal(items);
+        console.log("CART DATA:", items);
+
       } catch (err) {
         console.log("CART ERROR:", err);
       }
@@ -51,14 +54,9 @@ const Cart = () => {
 
 
   const getImg = (item) => {
-    let arr = [];
-    try {
-      arr = JSON.parse(item.image);
-    } catch {
-      arr = [];
-    }
-    const first = arr[0];
-    return "http://shoppe.test/upload/product/" + first;
+
+    
+    return `http://shoppe.test/upload/product/${item.image}`;
     // http://localhost/laravel8/laravel8/public/upload/product/${item.id_user}/${first}
   };
 
@@ -255,9 +253,9 @@ const Cart = () => {
                 <a className="btn btn-default update" href="#">
                   Update
                 </a>
-                <a className="btn btn-default check_out" href="#">
-                  Check Out
-                </a>
+              <Link to="/checkout" className="btn btn-default check_out">
+                Check Out
+              </Link>
               </div>
             </div>
 

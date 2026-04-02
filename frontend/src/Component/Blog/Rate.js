@@ -16,7 +16,7 @@ const Rate = ({ idBlog }) => {
   const fetchRate = async () => {
     try {
       const res = await axios.get(
-        `http://localhost/laravel8/laravel8/public/api/blog/rate/${idBlog}`
+        `http://shoppe.test/api/blog/rate/${idBlog}`
       );
 
       const list = res.data.data || [];
@@ -60,7 +60,7 @@ const Rate = ({ idBlog }) => {
 
     setRating(newRating); // update giao diện
 
-    const url = `http://localhost/laravel8/laravel8/public/api/blog/rate/${idBlog}`;
+    const url = `http://shoppe.test/api/blog/rate/${idBlog}`;
 
     const config = {
       headers: {

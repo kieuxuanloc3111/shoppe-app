@@ -28,4 +28,12 @@ Route::get('/blog', [BlogController::class,'index']);
 Route::get('/blog/detail/{id}', [BlogController::class,'detail']);
 
 Route::get('/blog/comment/{id}', [BlogController::class,'getComment']);
+Route::get('/blog/rate/{id}', [BlogController::class,'getRate']);
+
+Route::middleware('auth:sanctum')->group(function () {
+
+    Route::post('/blog/rate/{id}', [BlogController::class,'storeRate']);
+
+});
+
 ?>

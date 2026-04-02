@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Blog;
 use App\Models\Comment;
+use App\Models\Rate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 class BlogController extends Controller
@@ -82,6 +83,51 @@ class BlogController extends Controller
         return response()->json([
             'response' => 'success',
             'data' => $comment
+        ],200);
+    }
+    public function getRate($id)
+    {
+        $rates = Rate::where('blog_id',$id)->get();
+
+        return response()->json([
+            'response' => 'success',
+            'data' => $rates
+        ],200);
+    }
+
+    public function storeRate(Request $request,$id)
+    {
+        $user = Auth::user();
+
+        if(!$user){
+            return response()->json([
+                'response'=>'error',
+                'message'=>'Unauthenticated'
+            ],401);
+        }
+
+        $rate = Rate::where('blog_id',$id)
+                ->where('user_id',$user->id)
+                ->first();
+
+        if($rate){
+
+            $rate->rate = $request->rate;
+            $rate->save();
+
+        }else{
+
+            $rate = Rate::create([
+                'user_id'=>$user->id,
+                'blog_id'=>$id,
+                'rate'=>$request->rate
+            ]);
+
+        }
+
+        return response()->json([
+            'response'=>'success',
+            'data'=>$rate
         ],200);
     }
     

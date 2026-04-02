@@ -143,14 +143,29 @@ class ProductController extends Controller
     }
     public function productCart(Request $request) {
         
-        $data = $request->json()->all();
-        
+        $data = $request->cart; // 🔥 đúng key
+
         $getProduct = [];
+
         foreach ($data as $key => $value) {
-            $get = Products::findOrFail($key)->toArray();
-            $get['qty'] = $value;
-            $getProduct[] = $get;
+
+            $product = Products::find($key);
+
+            if($product){
+
+                $image = json_decode($product->image, true);
+
+                $getProduct[] = [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'price' => $product->price,
+                    'id_user' => $product->id_user,
+                    'image' => $image[0] ?? '',
+                    'qty' => $value
+                ];
+            }
         }
+
         return response()->json([
             'response' => 'success',
             'data' => $getProduct

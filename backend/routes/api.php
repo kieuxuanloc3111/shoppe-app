@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\MemberController;
 use App\Http\Controllers\Api\BlogController;
+use App\Http\Controllers\Api\CheckoutController;
+
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login',    [AuthController::class, 'login']);
 
@@ -21,6 +23,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 Route::get('/product', [ProductController::class, 'product']);
 Route::get('/product/detail/{id}', [ProductController::class, 'detail']);
 Route::post('/product/cart',[ProductController::class, 'productCart']);
+Route::post('/checkout', [CheckoutController::class,'checkout'])
+    ->middleware('auth:sanctum');
 
 
 

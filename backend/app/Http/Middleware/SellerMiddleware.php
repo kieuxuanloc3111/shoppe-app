@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class MemberMiddleware
+class SellerMiddleware
 {
     /**
      * Handle an incoming request.
@@ -15,11 +15,8 @@ class MemberMiddleware
      */
     public function handle($request, Closure $next)
     {
-        if (!auth()->check() || !in_array(auth()->user()->level, [
-            \App\Models\User::ROLE_SELLER,
-            \App\Models\User::ROLE_BUYER
-        ])) {
-            abort(403, 'Bạn không có quyền truy cập');
+        if (!auth()->check() || !auth()->user()->isSeller()) {
+            abort(403, 'Chỉ seller mới có quyền');
         }
 
         return $next($request);

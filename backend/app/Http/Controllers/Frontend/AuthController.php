@@ -37,7 +37,7 @@ class AuthController extends Controller
             'email'    => $request->email,
             'password' => Hash::make($request->password),
             'avatar'   => $avatarPath,
-            'level'    => 0,
+            'level' => $request->level ?? User::ROLE_BUYER,
         ]);
 
         return redirect()->route('member.login')
@@ -54,10 +54,26 @@ class AuthController extends Controller
         $credentials = [
             'email'    => $request->email,
             'password' => $request->password,
-            'level'    => 0, 
+            'level'    => User::ROLE_SELLER,
         ];
 
-        if (Auth::attempt($credentials, $request->filled('remember_me'))) {
+        // if (Auth::attempt($credentials, $request->filled('remember_me'))) {
+        //     return redirect()->route('home');
+        // }
+        if (Auth::attempt([
+            'email' => $request->email,
+            'password' => $request->password
+        ], $request->filled('remember_me'))) {
+
+            $user = Auth::user();
+
+            if ($user->isAdmin()) {
+                Auth::logout();
+                return back()->withErrors([
+                    'email' => 'Vui lòng đăng nhập tại trang admin',
+                ]);
+            }
+
             return redirect()->route('home');
         }
 

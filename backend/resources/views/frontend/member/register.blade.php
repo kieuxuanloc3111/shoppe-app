@@ -51,6 +51,18 @@
                         <input type="password"
                                name="password_confirmation"
                                placeholder="Confirm Password"/>
+                        <div style="margin: 10px 0;">
+                            <strong>Register as:</strong><br>
+                            <label style="margin-right: 10px;">
+                                <input type="radio" name="level" value="{{ \App\Models\User::ROLE_SELLER }}" checked>
+                                Seller
+                            </label>
+
+                            <label>
+                                <input type="radio" name="level" value="{{ \App\Models\User::ROLE_BUYER }}">
+                                Buyer
+                            </label>
+                        </div>
 
                         {{-- AVATAR --}}
                         <input type="file"

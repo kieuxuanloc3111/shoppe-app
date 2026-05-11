@@ -15,11 +15,8 @@ class MemberMiddleware
      */
     public function handle($request, Closure $next)
     {
-        if (!auth()->check() || !in_array(auth()->user()->level, [
-            \App\Models\User::ROLE_SELLER,
-            \App\Models\User::ROLE_BUYER
-        ])) {
-            abort(403, 'Bạn không có quyền truy cập');
+        if (!auth()->check() || auth()->user()->level != 0) {
+            abort(403, 'Bạn không phải member');
         }
 
         return $next($request);

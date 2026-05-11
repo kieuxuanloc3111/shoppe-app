@@ -65,11 +65,16 @@ class ProductController extends Controller
             'price' => $request->price,
             'category_id' => $request->category,
             'brand_id' => $request->brand,
-            'sale' => $request->status,
+
+            'sale' => (int) $request->status,
+            'status' => (int) $request->status,
+
             'sale_price' => $request->sale,
+
             'company' => $request->company,
             'detail' => $request->detail,
             'user_id' => $request->user_id,
+
             'image' => json_encode($images)
         ]);
 

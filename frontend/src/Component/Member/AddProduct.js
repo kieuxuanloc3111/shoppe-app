@@ -137,6 +137,11 @@ const AddProduct = () => {
 
     } catch (err) {
       console.log("api err:", err);
+      console.log(localStorage.getItem("token"))
+      console.log(err.response.data);
+
+      console.log(err.response);
+      console.log(err.response.data.message)
       alert("Thêm sản phẩm thất bại");
     }
   };

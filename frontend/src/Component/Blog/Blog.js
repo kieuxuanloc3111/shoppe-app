@@ -12,6 +12,7 @@ const Blog = () => {
       const res = await axios.get(
         `http://shoppe.test/api/blog?page=${page}`
       );
+      console.log(res.data);
 
       setBlogs(res.data.blog.data);
       setCurrentPage(res.data.blog.current_page);

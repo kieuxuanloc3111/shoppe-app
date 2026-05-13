@@ -31,7 +31,7 @@ const EditProduct = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost/laravel8/laravel8/public/api/category-brand")
+      .get("http://shoppe.test/api/category-brand")
       .then((res) => {
         setCategories(res.data.category);
         setBrands(res.data.brand );
@@ -40,7 +40,7 @@ const EditProduct = () => {
 
   useEffect(() => {
     axios
-      .get(`http://localhost/laravel8/laravel8/public/api/user/product/${id}`, {
+      .get(`http://shoppe.test/api/user/product/${id}`, {
         headers: { Authorization: "Bearer " + token },
       })
       .then((res) => {
@@ -121,7 +121,7 @@ const EditProduct = () => {
 
   const getExistingImageUrl = (filename) => {
     const userId = auth?.id || "0";
-    return `http://localhost/laravel8/laravel8/public/upload/product/${userId}/${filename}`;
+    return `http://shoppe.test/upload/product/${filename}`;
   };
 
   const handleSubmit = async (e) => {
@@ -169,7 +169,7 @@ const EditProduct = () => {
 
     try {
       const res = await axios.post(
-        `http://localhost/laravel8/laravel8/public/api/user/product/update/${id}`,
+        `http://shoppe.test/api/user/product/update/${id}`,
         formData,
         {
           headers: {

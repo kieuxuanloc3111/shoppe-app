@@ -176,4 +176,108 @@ class ProductController extends Controller
             'data' => $getProduct
         ], $this->successStatus);
     }
+
+    public function getProduct($id){
+        $product = Products::find($id);
+        if (!$product){
+                return response()->json([
+                'response' => 'error',
+                'message' => 'Product not found'
+            ],404);
+        }
+        return response() -> json([
+            'response' => 'success',
+            'data' =>[
+                'id' => $product ->id,
+                'name' => $product->name,
+                'price' => $product->price,
+                'id_category' => $product->category_id,
+                'id_brand' => $product->brand_id,
+                'status' => $product->sale,
+                'sale' => $product->sale_price,
+                'company_profile' => $product->company,
+                'detail' => $product->detail,
+                'image' => json_decode($product->image,true)
+            ]
+        ]);
+        
+    }
+    public function updateProduct(Request $request, $id)
+    {
+        $user = Auth::user();
+
+        $product = Products::findOrFail($id);
+
+        if ($product->user_id != $user->id) {
+            return response()->json([
+                'response' => 'error',
+                'message' => 'Permission denied'
+            ], 403);
+        }
+
+        $dir = public_path('upload/product');
+
+        if (!is_dir($dir)) {
+            mkdir($dir, 0777, true);
+        }
+
+        $oldImages = json_decode($product->image, true) ?? [];
+
+        // ảnh bị xoá
+        $deleteImages = $request->avatarCheckBox ?? [];
+
+        $finalImages = array_values(array_diff($oldImages, $deleteImages));
+
+        // xoá file vật lý
+        foreach ($deleteImages as $img) {
+
+            $path = $dir . '/' . $img;
+
+            if (file_exists($path)) {
+                unlink($path);
+            }
+        }
+
+        // upload ảnh mới
+        if ($request->hasFile('file')) {
+
+            foreach ($request->file('file') as $file) {
+
+                $filename = time() . '_' . $file->getClientOriginalName();
+
+                $file->move($dir, $filename);
+
+                $finalImages[] = $filename;
+            }
+        }
+
+        // update db
+        $product->update([
+            'name' => $request->name,
+            'price' => $request->price,
+            'category_id' => $request->category,
+            'brand_id' => $request->brand,
+
+            // status sản phẩm
+            'status' => $request->status,
+
+            // sale yes/no
+            'sale' => $request->status == 0 ? 1 : 0,
+
+            // giá sale
+            'sale_price' => $request->sale,
+
+            'company' => $request->company,
+            'detail' => $request->detail,
+
+            'image' => json_encode($finalImages)
+        ]);
+
+        $product->refresh();
+
+        return response()->json([
+            'response' => 'success',
+            'data' => $product
+        ], 200);
+    }
 }

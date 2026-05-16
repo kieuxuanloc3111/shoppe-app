@@ -12,9 +12,8 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $products = Products::orderBy('updated_at', 'desc')
-            ->take(6)
-            ->get();
+        $products = Products::orderBy('updated_at', 'desc')->paginate(6);
+
 
         $categories = Category::all();
         $brands     = Brand::all();

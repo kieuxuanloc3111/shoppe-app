@@ -29,43 +29,71 @@ class ProductController extends Controller
         if (!is_dir($dir)) {
             mkdir($dir, 0755, true);
         }
+
         $images = [];
 
         $manager = new ImageManager(new Driver());
 
+        // upload ảnh
         if ($request->hasFile('images')) {
+
             foreach ($request->file('images') as $file) {
 
                 $name = time() . '_' . $file->getClientOriginalName();
 
-                $fullPath   = public_path('upload/product/' . $name);
-                $smallPath  = public_path('upload/product/85x84_' . $name);
-                $mediumPath = public_path('upload/product/329x380_' . $name);
+                $fullPath   = $dir . '/' . $name;
+                $smallPath  = $dir . '/85x84_' . $name;
+                $mediumPath = $dir . '/329x380_' . $name;
 
-                $image = $manager->read($file);
+                // ảnh gốc
+                $manager->read($file)
+                    ->save($fullPath);
 
-                $image->save($fullPath);
-                $image->resize(85, 84)->save($smallPath);
-                $image->resize(329, 380)->save($mediumPath);
+                // ảnh nhỏ
+                $manager->read($file)
+                    ->resize(85, 84)
+                    ->save($smallPath);
+
+                // ảnh lớn
+                $manager->read($file)
+                    ->resize(329, 380)
+                    ->save($mediumPath);
 
                 $images[] = $name;
             }
         }
 
         Products::create([
+
             'name'        => $request->name,
+
             'price'       => $request->price,
-            'sale'        => $request->sale,
-            'sale_price'  => $request->sale_price,
-            'company'     => $request->company,
-            'detail'      => $request->detail,
-            'status'      => 0, 
+
             'category_id' => $request->category_id,
+
             'brand_id'    => $request->brand_id,
+
+            // logic giống API
+            // 1 = new
+            // 0 = sale
+            'sale'        => $request->status == 0 ? 1 : 0,
+
+            // nếu sale mới có giá sale
+            'sale_price'  => $request->status == 0
+                                ? $request->sale
+                                : null,
+
+            'company'     => $request->company,
+
+            'detail'      => $request->detail,
+
+            // active product
+            'status'      => 1,
+
             'image'       => json_encode($images),
+
             'user_id'     => auth()->id(),
         ]);
-
 
         return back()->with('success', 'Add product success');
     }

@@ -16,7 +16,7 @@ const Rate = ({ idBlog }) => {
   const fetchRate = async () => {
     try {
       const res = await axios.get(
-        `http://shoppe.test/api/blog/rate/${idBlog}`
+        `http://127.0.0.1:8000/api/blog/rate/${idBlog}`
       );
 
       const list = res.data.data || [];
@@ -60,7 +60,7 @@ const Rate = ({ idBlog }) => {
 
     setRating(newRating); // update giao diện
 
-    const url = `http://shoppe.test/api/blog/rate/${idBlog}`;
+    const url = `http://127.0.0.1:8000/api/blog/rate/${idBlog}`;
 
     const config = {
       headers: {

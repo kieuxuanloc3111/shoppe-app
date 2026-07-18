@@ -22,7 +22,7 @@ const Blog_detail = () => {
       try {
         const res = await axios.get(
           
-          `http://shoppe.test/api/blog/detail/${params.id}`
+          `http://127.0.0.1:8000/api/blog/detail/${params.id}`
           // http://localhost/laravel8/laravel8/public/api/blog/detail/${params.id}
         );
 
@@ -33,7 +33,7 @@ const Blog_detail = () => {
         // setComments(Array.isArray(apiComments) ? apiComments : []);
         // console.log(comments);
         const commentRes = await axios.get(
-          `http://shoppe.test/api/blog/comment/${params.id}`
+          `http://127.0.0.1:8000/api/blog/comment/${params.id}`
         );
 
         setComments(commentRes.data.data);
@@ -84,7 +84,7 @@ const Blog_detail = () => {
                 </div>
 
                 <img
-                  src={`http://shoppe.test/${data.image}`}
+                  src={`http://127.0.0.1:8000/${data.image}`}
                   // http://localhost/laravel8/laravel8/public/upload/Blog/image/${data.image
                   alt=""
                 />

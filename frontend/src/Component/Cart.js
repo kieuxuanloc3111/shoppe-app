@@ -55,7 +55,7 @@ const Cart = () => {
       try {
 
         const res = await axios.post(
-          "http://shoppe.test/api/product/cart",
+          "http://127.0.0.1:8000/api/product/cart",
           { cart },
           {
             headers: {
@@ -115,7 +115,7 @@ const Cart = () => {
     }
 
     return (
-      "http://shoppe.test/upload/product/" +
+      "http://127.0.0.1:8000/upload/product/" +
       arr[0]
     );
 

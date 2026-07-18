@@ -25,7 +25,7 @@ const Checkout = () => {
 
         // gọi API lấy product theo id
         const res = await axios.post(
-          "http://shoppe.test/api/product/cart",
+          "http://127.0.0.1:8000/api/product/cart",
           { cart: cartLocal }
         );
 
@@ -56,7 +56,7 @@ const Checkout = () => {
     try {
 
       const res = await axios.post(
-        "http://shoppe.test/api/checkout",
+        "http://127.0.0.1:8000/api/checkout",
         {
           name: form.name,
           phone: form.phone,
@@ -152,7 +152,7 @@ const Checkout = () => {
 
                           <td className="cart_product">
                             <img
-                              src={`http://shoppe.test/upload/product/${item.id_user}/${item.image}`}
+                              src={`http://127.0.0.1:8000/upload/product/${item.id_user}/${item.image}`}
                               alt=""
                               style={{width:85}}
                             />

@@ -96,7 +96,7 @@ const UpdateUser = () => {
 
     try {
       const res = await axios.post(
-        `http://shoppe.test/api/user/update/${userId}`,
+        `http://127.0.0.1:8000/api/user/update/${userId}`,
         // `http://localhost/laravel8/laravel8/public/api/user/update/${userId}`,
         newdata,
         {

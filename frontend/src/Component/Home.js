@@ -25,7 +25,7 @@ const Home = () => {
       try {
 
         const res = await axios.get(
-          "http://shoppe.test/api/product"
+          "http://127.0.0.1:8000/api/product"
         );
 
         setProducts(res.data.data);
@@ -60,7 +60,7 @@ const Home = () => {
     const firstImage = imgArray[0];
 
     return (
-      "http://shoppe.test/upload/product/" +
+      "http://127.0.0.1:8000/upload/product/" +
       firstImage
     );
 

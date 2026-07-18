@@ -10,7 +10,7 @@ const Blog = () => {
   const fetchBlogs = async (page = 1) => {
     try {
       const res = await axios.get(
-        `http://shoppe.test/api/blog?page=${page}`
+        `http://127.0.0.1:8000/api/blog?page=${page}`
       );
       console.log(res.data);
 
@@ -58,7 +58,7 @@ const Blog = () => {
                     </div>
 
                     <img
-                      src={`http://shoppe.test/${item.image}`}
+                      src={`http://127.0.0.1:8000/${item.image}`}
                       alt={item.title}
                       style={{ width: "40%", height: "40%" }}
                     />

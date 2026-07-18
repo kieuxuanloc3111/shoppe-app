@@ -31,7 +31,7 @@ const EditProduct = () => {
 
   useEffect(() => {
     axios
-      .get("http://shoppe.test/api/category-brand")
+      .get("http://127.0.0.1:8000/api/category-brand")
       .then((res) => {
         setCategories(res.data.category);
         setBrands(res.data.brand );
@@ -40,7 +40,7 @@ const EditProduct = () => {
 
   useEffect(() => {
     axios
-      .get(`http://shoppe.test/api/user/product/${id}`, {
+      .get(`http://127.0.0.1:8000/api/user/product/${id}`, {
         headers: { Authorization: "Bearer " + token },
       })
       .then((res) => {
@@ -121,7 +121,7 @@ const EditProduct = () => {
 
   const getExistingImageUrl = (filename) => {
     const userId = auth?.id || "0";
-    return `http://shoppe.test/upload/product/${filename}`;
+    return `http://127.0.0.1:8000/upload/product/${filename}`;
   };
 
   const handleSubmit = async (e) => {
@@ -169,7 +169,7 @@ const EditProduct = () => {
 
     try {
       const res = await axios.post(
-        `http://shoppe.test/api/user/product/update/${id}`,
+        `http://127.0.0.1:8000/api/user/product/update/${id}`,
         formData,
         {
           headers: {

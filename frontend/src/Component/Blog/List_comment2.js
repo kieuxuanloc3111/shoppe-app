@@ -128,7 +128,7 @@ const ListComment2 = ({ comments = [], onReply }) => {
               <a className="pull-left" href="#">
                 <img
                   className="media-object"
-                  src={`http://shoppe.test/${parent.user_avatar}`}
+                  src={`http://127.0.0.1:8000/${parent.user_avatar}`}
                   alt=""
                   style={{
                     width:60,
@@ -171,7 +171,7 @@ const ListComment2 = ({ comments = [], onReply }) => {
                   <a className="pull-left" href="#">
                     <img
                       className="media-object"
-                      src={`http://shoppe.test/${child.user_avatar}`}
+                      src={`http://127.0.0.1:8000/${child.user_avatar}`}
                       alt=""
                       style={{
                         width:60,

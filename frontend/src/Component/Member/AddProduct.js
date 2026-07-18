@@ -22,7 +22,7 @@ const AddProduct = () => {
   useEffect(() => {
     const fetchData = async () => {
       const res = await axios.get(
-        "http://shoppe.test/api/category-brand"
+        "http://127.0.0.1:8000/api/category-brand"
         // http://localhost/laravel8/laravel8/public/api/category-brand
       );
 
@@ -121,7 +121,7 @@ const AddProduct = () => {
     try {
       const res = await axios.post(
     
-        "http://shoppe.test/api/user/product/add",
+        "http://127.0.0.1:8000/api/user/product/add",
         // http://localhost/laravel8/laravel8/public/api/user/product/add
         formData,
         {

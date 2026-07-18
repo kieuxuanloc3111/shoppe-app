@@ -14,16 +14,18 @@ return new class extends Migration {
             $table->string('email')->unique();
             $table->string('password');
 
-            $table->string('phone')->nullable();
-            $table->string('address')->nullable();
+            $table->integer('level')->comment('1: admin, 0: member');
+
+            $table->string('phone', 20)->nullable();
+            $table->string('address', 500)->nullable();
             $table->string('avatar')->nullable();
             $table->unsignedBigInteger('id_country')->nullable();
 
             $table->timestamps();
 
+            $table->rememberToken();
         });
     }
-
 
     public function down(): void
     {

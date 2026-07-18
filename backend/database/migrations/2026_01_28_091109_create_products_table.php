@@ -15,13 +15,16 @@ return new class extends Migration
             $table->string('name');
             $table->decimal('price', 15, 2);
 
-            // sale
-            $table->tinyInteger('sale')->default(0); // 0: new, 1: sale
+            // sale flag (0: new, 1: sale)
+            $table->boolean('sale');
             $table->decimal('sale_price', 15, 2)->nullable();
 
             // info
             $table->string('company');
             $table->text('detail');
+
+            // status flag
+            $table->boolean('status');
 
             // image (json string)
             $table->string('image'); // lưu json_encode

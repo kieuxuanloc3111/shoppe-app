@@ -280,4 +280,68 @@ class ProductController extends Controller
             'data' => $product
         ], 200);
     }
+
+    // ported from Frontend\ProductController@search
+    public function search(Request $request)
+    {
+        $keyword = $request->keyword;
+
+        $products = $keyword
+            ? Products::where('name', 'LIKE', '%' . $keyword . '%')->get()
+            : collect();
+
+        return response()->json([
+            'response' => 'success',
+            'keyword'  => $keyword,
+            'data'     => $products,
+        ], $this->successStatus);
+    }
+
+    // ported from Frontend\ProductController@advancedSearch
+    public function advancedSearch(Request $request)
+    {
+        $query = Products::orderBy('updated_at', 'desc');
+
+        if ($request->filled('name')) {
+            $query->where('name', 'LIKE', '%' . $request->name . '%');
+        }
+        if ($request->filled('price_range')) {
+            [$min, $max] = explode('-', $request->price_range);
+            $query->whereBetween('price', [$min, $max]);
+        }
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+        if ($request->filled('brand_id')) {
+            $query->where('brand_id', $request->brand_id);
+        }
+        if ($request->filled('status')) {
+            if ($request->status == 'sale') {
+                $query->where('sale', 1);
+            } elseif ($request->status == 'new') {
+                $query->where('sale', 0);
+            }
+        }
+
+        return response()->json([
+            'response'   => 'success',
+            'data'       => $query->paginate(6)->withQueryString(),
+            'categories' => Category::all(),
+            'brands'     => Brand::all(),
+        ], $this->successStatus);
+    }
+
+    // ported from Frontend\ProductController@filterPrice (computed sale price)
+    public function filterPrice(Request $request)
+    {
+        $products = Products::whereRaw(
+            "(CASE WHEN sale_price > 0 THEN price - (price * sale_price / 100) ELSE price END) BETWEEN ? AND ?",
+            [$request->min, $request->max]
+        )->orderBy('updated_at', 'desc')->get();
+
+        return response()->json([
+            'response' => 'success',
+            'data'     => $products,
+        ], $this->successStatus);
+    }
 }

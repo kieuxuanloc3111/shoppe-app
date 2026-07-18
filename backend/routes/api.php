@@ -10,6 +10,15 @@ use App\Http\Controllers\Api\CheckoutController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login',    [AuthController::class, 'login']);
 
+// forgot / reset password (ported from blade Frontend)
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+Route::post('/reset-password',  [AuthController::class, 'resetPassword']);
+
+// search (ported from blade Frontend\ProductController)
+Route::get('/search',          [ProductController::class, 'search']);
+Route::get('/advanced-search', [ProductController::class, 'advancedSearch']);
+Route::get('/filter-price',    [ProductController::class, 'filterPrice']);
+
 Route::get('/category-brand', [ProductController::class, 'categoryBrand']);
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/user/update/{id}',[MemberController::class, 'updateProfile']);

@@ -4,21 +4,24 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| FRONTEND HOME (PUBLIC)
+| ROOT — Laravel app is admin-only now (React SPA is the client on :3000)
+| Guest -> admin login, logged-in admin -> dashboard
 |--------------------------------------------------------------------------
 */
-use App\Http\Controllers\Frontend\HomeController;
-
-Route::get('/', [HomeController::class, 'index'])
-    ->name('home');
+Route::get('/', function () {
+    if (auth()->check() && auth()->user()->level == 1) {
+        return redirect()->route('admin.dashboard');
+    }
+    return redirect()->route('login');
+});
 
 
 /*
 |--------------------------------------------------------------------------
-| AUTH DEFAULT (Laravel)
+| AUTH (admin login) — reset unified to React /forgot-password, so off here
 |--------------------------------------------------------------------------
 */
-Auth::routes();
+Auth::routes(['register' => false, 'reset' => false, 'verify' => false, 'confirm' => false]);
 
 
 /*
@@ -34,6 +37,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\HistoryController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
+
 Route::prefix('admin')
     ->middleware(['auth', 'admin'])
     ->name('admin.')
@@ -60,6 +64,7 @@ Route::prefix('admin')
 
         Route::get('/user/{id}/delete', [UserController::class, 'destroy'])
             ->name('user.delete');
+
         // PRODUCT ADMIN
         Route::get('/product', [AdminProductController::class, 'index'])
             ->name('product.index');
@@ -73,7 +78,6 @@ Route::prefix('admin')
         Route::get('/product/{id}/delete', [AdminProductController::class, 'destroy'])
             ->name('product.delete');
 
-        
         Route::get('/history', [HistoryController::class, 'index'])
             ->name('history.index');
 
@@ -109,162 +113,3 @@ Route::prefix('admin')
         Route::put('/brand/{id}', [BrandController::class, 'update'])->name('brand.update');
         Route::get('/brand/{id}/delete', [BrandController::class, 'destroy'])->name('brand.delete');
     });
-
-
-/*
-|--------------------------------------------------------------------------
-| MEMBER AUTH (LOGIN / REGISTER)
-|--------------------------------------------------------------------------
-*/
-use App\Http\Controllers\Frontend\AuthController;
-
-Route::prefix('member')->group(function () {
-
-    Route::get('/register', [AuthController::class, 'registerForm'])
-        ->name('member.register');
-
-    Route::post('/register', [AuthController::class, 'register'])
-        ->name('member.register.post');
-
-    Route::get('/login', [AuthController::class, 'loginForm'])
-        ->name('member.login');
-
-    Route::post('/login', [AuthController::class, 'login'])
-        ->name('member.login.post');
-});
-
-
-/*
-|--------------------------------------------------------------------------
-| MEMBER ROUTES (LEVEL = 0)
-|--------------------------------------------------------------------------
-*/
-use App\Http\Controllers\Frontend\CartController;
-use App\Http\Controllers\Frontend\BlogController as FrontendBlogController;
-use App\Http\Controllers\Frontend\ProductController;
-use App\Http\Controllers\Frontend\CommentController;
-Route::prefix('member')
-    ->middleware(['auth', 'member'])
-    ->group(function () {
-        Route::post('/blog/rate', [FrontendBlogController::class, 'rate'])
-            ->name('blog.rate');
-
-        Route::post('/blog/comment', [CommentController::class, 'store'])
-            ->name('blog.comment');
-        Route::post('/logout', [AuthController::class, 'logout'])
-            ->name('member.logout');
-
-
-        Route::get('/profile', [AuthController::class, 'profileForm'])
-            ->name('member.profile');
-
-        Route::post('/profile', [AuthController::class, 'updateProfile'])
-            ->name('member.profile.update');
-
-        // PRODUCT
-        Route::get('/add-product', [ProductController::class, 'create'])
-            ->name('member.product.add');
-
-        Route::post('/add-product', [ProductController::class, 'store'])
-            ->name('member.product.store');
-
-        Route::get('/my-product', [ProductController::class, 'myProduct'])
-            ->name('member.product.my');
-
-        Route::get('/product/{id}/edit', [ProductController::class, 'edit'])
-            ->name('member.product.edit');
-
-        Route::post('/product/{id}/update', [ProductController::class, 'update'])
-            ->name('member.product.update');
-
-        Route::get('/product/{id}/delete', [ProductController::class, 'destroy'])
-            ->name('member.product.delete');
-
-
-
-        Route::post('/add-to-cart', [CartController::class, 'add'])
-            ->name('member.cart.add');
-    });
-/*
-|--------------------------------------------------------------------------
-| home
-|--------------------------------------------------------------------------
-*/
-Route::get('/home', [HomeController::class, 'index'])
-    ->name('home');
-
-Route::get('product/{id}', [ProductController::class, 'detail'])
-    ->name('product.detail');
-/*
-|--------------------------------------------------------------------------
-| cart
-|--------------------------------------------------------------------------
-*/
-Route::post('/add-to-cart', [CartController::class, 'add'])
-    ->name('cart.add');
-Route::get('/cart', [CartController::class, 'index'])
-    ->name('cart.index');
-
-Route::post('/cart/update', [CartController::class, 'update'])
-    ->name('cart.update');
-
-Route::post('/cart/delete', [CartController::class, 'delete'])
-    ->name('cart.delete');
-
-/*
-|--------------------------------------------------------------------------
-| BLOG FRONTEND
-|--------------------------------------------------------------------------
-*/
-
-Route::get('/blog', [FrontendBlogController::class, 'index'])
-    ->name('blog.index');
-
-Route::get('/blog/{id}', [FrontendBlogController::class, 'detail'])
-    ->name('blog.detail');
-
-use App\Mail\MailNotify;
-use Illuminate\Support\Facades\Mail;
-
-Route::get('/test-mail', function () {
-    Mail::to('kieuxuanloc3111@gmail.com')->send(new MailNotify());
-    return 'Send mail OK';
-});
-
-
-/*
-|--------------------------------------------------------------------------
-| checkout
-|--------------------------------------------------------------------------
-*/
-use App\Http\Controllers\Frontend\CheckoutController;
-use App\Http\Controllers\Frontend\ForgotPasswordController;
-
-Route::get('/checkout', [CheckoutController::class, 'index'])
-    ->name('checkout.index');
-
-Route::post('/checkout', [CheckoutController::class, 'process'])
-    ->name('checkout.process');
-
-    // search
-
-Route::get('/search', [ProductController::class, 'search'])
-    ->name('search');
-
-Route::get('/advancedsearch', [ProductController::class, 'advancedSearch'])
-    ->name('advancedsearch');
-Route::get('/filter-price', [ProductController::class, 'filterPrice'])
-    ->name('filter.price');
-
-// forget pas
-Route::get('/forgot-password', [ForgotPasswordController::class, 'showForm'])
-    ->name('password.request');
-
-Route::post('/forgot-password', [ForgotPasswordController::class, 'sendLink'])
-    ->name('password.email');
-
-Route::get('/reset-password/{token}', [ForgotPasswordController::class, 'resetForm'])
-    ->name('password.reset');
-
-Route::post('/reset-password', [ForgotPasswordController::class, 'updatePassword'])
-    ->name('password.update');

@@ -19,6 +19,9 @@ import Cart from './Component/Cart';
 // import "bootstrap/dist/css/bootstrap.min.css";
 // import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import Checkout from './Component/Checkout';
+import Search from './Component/Search';
+import ForgotPassword from './Component/Member/ForgotPassword';
+import ResetPassword from './Component/Member/ResetPassword';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -40,6 +43,9 @@ root.render(
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/cart" element={<Cart/>} />
           <Route path="/checkout" element={<Checkout/>} />
+          <Route path="/search" element={<Search/>} />
+          <Route path="/forgot-password" element={<ForgotPassword/>} />
+          <Route path="/reset-password" element={<ResetPassword/>} />
         </Routes>
       </App>
     </BrowserRouter>

@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Password;
 // use Intervention\Image\Facades\Image;
 class AuthController extends Controller
 {
@@ -89,5 +90,46 @@ class AuthController extends Controller
                 'errors'   => ['errors' => 'invalid email or password'],
             ], $this->successStatus);
         }
+    }
+
+    // client-only reset (React). Admin (level=1) has no self-service reset.
+    public function forgotPassword(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+
+        // only members get a link; admin emails are ignored silently
+        $user = User::where('email', $request->email)->first();
+        if ($user && $user->level == 0) {
+            Password::sendResetLink($request->only('email'));
+        }
+
+        // same response either way — no user/level enumeration
+        return response()->json([
+            'response' => 'success',
+            'message'  => 'If that email is registered, a reset link has been sent.',
+        ], $this->successStatus);
+    }
+
+    // ported from Frontend\ForgotPasswordController@updatePassword
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'token'    => 'required',
+            'email'    => 'required|email',
+            'password' => 'required|min:6|confirmed',
+        ]);
+
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->password = Hash::make($password);
+                $user->save();
+            }
+        );
+
+        return response()->json([
+            'response' => $status === Password::PASSWORD_RESET ? 'success' : 'error',
+            'message'  => __($status),
+        ], $this->successStatus);
     }
 }

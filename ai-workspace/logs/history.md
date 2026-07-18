@@ -110,3 +110,14 @@ Ghi mới thêm vào cuối. Mới nhất ở dưới cùng.
 - **File đụng:** Api/MemberController
 - **Quy tắc mới:** test xong pass thì xóa (CLAUDE.md #7).
 
+## 2026-07-18 — P0/T3: danh mục cây + hoa hồng
+- **Làm gì:** Migration categories +`parent_id`(self FK nullOnDelete) +`slug` unique
+  +`commission_rate`(decimal 5,2 default 0). Category model: parent/children/childrenRecursive
+  (đệ quy dựng cây), slug tự sinh khi tạo (booted creating), cast commission decimal:2.
+  Api/CategoryController@index GET /api/categories trả cây. Admin CategoryController store/update
+  nhận parent_id + commission_rate (coerce null→0). Blade create/edit: dropdown cha + ô hoa hồng.
+- **Vì sao:** Danh mục 2 tầng (quần áo/đồ ăn...) + hoa hồng theo ngành cho bộ máy phí (P1).
+- **Verify:** test cây đệ quy + slug tự tăng + commission — pass 3/3, đã xóa.
+- **File đụng:** create_categories migration, Category, Api/CategoryController, Admin/CategoryController,
+  category create+edit blade, routes/api.php
+

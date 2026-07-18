@@ -34,7 +34,7 @@ Sau phase này: có shop, sản phẩm đúng chuẩn, giỏ server, hết 4 l�
 - [x] Bảng `shops` + onboarding người bán; middleware `role` / `seller`  *(T1+T2 xong)*
 - [ ] `products`: `user_id`→`shop_id`, +slug, +soft delete, +sold_count
 - [ ] `product_variants` (giá + tồn kho) + `product_images` (bỏ json 1 ô)
-- [ ] Danh mục cây (`parent_id`) + `commission_rate` theo ngành hàng
+- [x] Danh mục cây (`parent_id`) + `commission_rate` theo ngành hàng  *(T3 xong)*
 - [ ] Giỏ hàng server-side (`carts` / `cart_items`)
 - [~] **Vá 4 lỗi chặn:** ~~IDOR update profile~~ (T7 xong: +chống leo quyền, +ẩn password);
       giá tính từ DB · nền tảng đơn thật · tồn kho → dời P1 (sống trong checkout/orders)

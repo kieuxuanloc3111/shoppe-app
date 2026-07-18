@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\MemberController;
 use App\Http\Controllers\Api\BlogController;
 use App\Http\Controllers\Api\CheckoutController;
 use App\Http\Controllers\Api\ShopController;
+use App\Http\Controllers\Api\CategoryController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login',    [AuthController::class, 'login']);
@@ -21,6 +22,9 @@ Route::get('/advanced-search', [ProductController::class, 'advancedSearch']);
 Route::get('/filter-price',    [ProductController::class, 'filterPrice']);
 
 Route::get('/category-brand', [ProductController::class, 'categoryBrand']);
+// cây danh mục (công khai)
+Route::get('/categories', [CategoryController::class, 'index']);
+
 // gian hàng công khai
 Route::get('/shops/{slug}', [ShopController::class, 'show']);
 

@@ -42,7 +42,7 @@ class LoginController extends Controller
 
     protected function authenticated(Request $request, $user)
     {
-        if ($user->level != 1) {
+        if ($user->role !== 'admin') {
             Auth::logout();
 
             return redirect()->route('login')->withErrors([

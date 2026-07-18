@@ -52,7 +52,7 @@ class AuthController extends Controller
             'password' => Hash::make($data['password']),
             'phone' => $data['phone'] ?? null,
             'address' => $data['address'] ?? null,
-            'level' => 0,
+            'role' => 'user',
             'avatar' => $avatarName
         ]);
 
@@ -66,7 +66,7 @@ class AuthController extends Controller
         $login = [
             'email'    => $request->email,
             'password' => $request->password,
-            'level'    => 0,
+            'role'     => 'user',
         ];
 
         $remember = $request->filled('remember_me');
@@ -99,7 +99,7 @@ class AuthController extends Controller
 
         // only members get a link; admin emails are ignored silently
         $user = User::where('email', $request->email)->first();
-        if ($user && $user->level == 0) {
+        if ($user && $user->role === 'user') {
             Password::sendResetLink($request->only('email'));
         }
 

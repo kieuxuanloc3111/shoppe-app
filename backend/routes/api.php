@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\MemberController;
 use App\Http\Controllers\Api\BlogController;
 use App\Http\Controllers\Api\CheckoutController;
+use App\Http\Controllers\Api\ShopController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login',    [AuthController::class, 'login']);
@@ -20,7 +21,14 @@ Route::get('/advanced-search', [ProductController::class, 'advancedSearch']);
 Route::get('/filter-price',    [ProductController::class, 'filterPrice']);
 
 Route::get('/category-brand', [ProductController::class, 'categoryBrand']);
+// gian hàng công khai
+Route::get('/shops/{slug}', [ShopController::class, 'show']);
+
 Route::middleware(['auth:sanctum'])->group(function () {
+    // mở gian hàng (chưa cần là seller); sửa gian hàng thì phải là seller
+    Route::post('/shops', [ShopController::class, 'store']);
+    Route::put('/seller/shop', [ShopController::class, 'update'])->middleware('seller');
+
     Route::post('/user/update/{id}',[MemberController::class, 'updateProfile']);
     Route::post('/user/product/add', [ProductController::class, 'addProduct']);
     Route::get('/user/my-product', [ProductController::class, 'myProduct']);

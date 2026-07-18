@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\JsonResponse;
-use Intervention\Image\Facades\Image ;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
 
@@ -16,78 +15,60 @@ class MemberController extends Controller
 {
     public $successStatus = 200;
 
-    public function updateProfile(Request $request, $id)
+    // $id trong URL BỊ BỎ QUA — chỉ sửa được chính tài khoản đang đăng nhập (chống IDOR).
+    public function updateProfile(Request $request, $id = null)
     {
-        $user = User::findOrFail($id);
-        $data = $request->all();
+        $user = auth()->user();
 
-        // check email tồn tại
-        $getEmail = User::where('email', $data['email'])
-            ->where('id', '<>', $id)
-            ->first();
+        // whitelist field — KHÔNG cho set role/status/level qua đây (chống leo quyền)
+        $data = $request->validate([
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|unique:users,email,' . $user->id,
+            'phone'    => 'nullable|string|max:20',
+            'address'  => 'nullable|string|max:500',
+            'password' => 'nullable|string|min:6',
+            'avatar'   => 'nullable|string',
+        ]);
 
-        if ($getEmail) {
-            return response()->json([
-                'errors' => ['errors' => 'Email da ton tai'],
-                'email' => $getEmail->email
-            ], JsonResponse::HTTP_OK);
-        }
+        // avatar mới (base64) → resize + lưu; không có thì giữ nguyên
+        if (!empty($data['avatar']) && strpos($data['avatar'], ';')) {
+            $file = $data['avatar'];
 
-        $file = $request->avatar;
-
-        // nếu có avatar mới
-        if (!empty($file) && strpos($file, ';')) {
-
-            // xóa avatar cũ
-            if ($user->avatar && file_exists(public_path('uploads/avatars/'.$user->avatar))) {
-                unlink(public_path('uploads/avatars/'.$user->avatar));
+            if ($user->avatar && file_exists(public_path('uploads/avatars/' . $user->avatar))) {
+                unlink(public_path('uploads/avatars/' . $user->avatar));
             }
 
-            // lấy extension
-            $name = time().'.'.explode('/', explode(':', substr($file, 0, strpos($file, ';')))[1])[1];
-
-            // decode base64
+            $name = time() . '.' . explode('/', explode(':', substr($file, 0, strpos($file, ';')))[1])[1];
             $imageData = base64_decode(explode(',', $file)[1]);
 
-            // tạo folder nếu chưa có
             $path = public_path('uploads/avatars');
             if (!file_exists($path)) {
                 mkdir($path, 0777, true);
             }
 
-            // dùng ImageManager
-            $manager = new ImageManager(new Driver());
-            $img = $manager->read($imageData);
-
-            // resize avatar
-            $img->resize(200, 200);
-
-            $img->save($path.'/'.$name);
-
+            (new ImageManager(new Driver()))->read($imageData)->resize(200, 200)->save($path . '/' . $name);
             $data['avatar'] = $name;
-
         } else {
-            // nếu không có avatar mới → giữ avatar cũ
-            $data['avatar'] = $user->avatar;
+            unset($data['avatar']); // giữ avatar cũ
         }
 
-        // password
+        // password: có thì hash, không thì giữ nguyên
         if (!empty($data['password'])) {
             $data['password'] = bcrypt($data['password']);
         } else {
-            $data['password'] = $user->password;
+            unset($data['password']);
         }
 
         $user->update($data);
 
-        $data['id'] = $id;
-
+        // token trả lại để giữ tương thích frontend (UpdateUser.js cần res.data.token).
+        // ponytail: nên bỏ khi dọn frontend — tạo token mỗi lần sửa profile là thừa.
         $token = $user->createToken('authToken')->plainTextToken;
 
         return response()->json([
             'response' => 'success',
             'token' => $token,
-            'Auth' => $data
+            'Auth' => $user->only(['id', 'name', 'email', 'phone', 'address', 'avatar']),
         ], $this->successStatus);
     }
 }

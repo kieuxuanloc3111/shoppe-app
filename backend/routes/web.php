@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 Route::get('/', function () {
-    if (auth()->check() && auth()->user()->level == 1) {
+    if (auth()->check() && auth()->user()->role === 'admin') {
         return redirect()->route('admin.dashboard');
     }
     return redirect()->route('login');

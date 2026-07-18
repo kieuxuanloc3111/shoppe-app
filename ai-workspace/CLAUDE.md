@@ -40,3 +40,11 @@ ai-workspace/
    Quyết định lớn ghi ở phần "Quyết định đã chốt".
 
 5. **Không tự ý mở rộng phạm vi.** Chỉ làm đúng phase đang mở. Nghi ngờ thì hỏi.
+
+6. **Lệnh chạy thật (migrate, seed, npm, artisan, git...) → NGƯỜI DÙNG chạy, không phải AI.**
+   AI chỉ viết code + hướng dẫn lệnh để người dùng tự chạy.
+   Ngoại lệ: AI được chạy lệnh để TỰ KIỂM TRA / debug / lint khi đang code (VD `php -l`,
+   đọc schema, chạy test để fix lỗi). Không chạy lệnh làm đổi trạng thái project của người dùng.
+
+7. **Test là công cụ dùng-một-lần.** Viết test verify task → chạy `php artisan test` cho pass
+   → XÓA file test. Không giữ lại (repo nhẹ). AI tự chạy test để verify trước khi xóa.

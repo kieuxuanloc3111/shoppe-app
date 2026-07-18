@@ -9,7 +9,7 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
-    use Notifiable;
+
     protected $fillable = [
         'name',
         'email',
@@ -18,10 +18,34 @@ class User extends Authenticatable
         'address',
         'avatar',
         'id_country',
-        'level',
+        'role',
+        'status',
     ];
 
     protected $hidden = [
         'password',
+        'remember_token',
     ];
+
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    // seller = user (không phải admin) có shop đang active
+    public function isSeller(): bool
+    {
+        return $this->role === 'user'
+            && $this->shop
+            && $this->shop->status === 'active';
+    }
+
+    public function shop()
+    {
+        return $this->hasOne(Shop::class);
+    }
 }

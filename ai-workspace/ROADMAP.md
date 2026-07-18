@@ -30,13 +30,14 @@ Thiết kế tổng thể: xem design doc (artifact) — ERD, dòng tiền ký q
 
 ### P0 — Nền tảng vai trò & catalog  ☐
 Sau phase này: có shop, sản phẩm đúng chuẩn, giỏ server, hết 4 lỗi chặn.
-- [ ] `users.level` → `users.role` (admin/user) + status + email verify
-- [ ] Bảng `shops` + onboarding người bán; middleware `role` / `seller`
+- [x] `users.level` → `users.role` (admin/user) + status + email verify  *(T1 xong)*
+- [x] Bảng `shops` + onboarding người bán; middleware `role` / `seller`  *(T1+T2 xong)*
 - [ ] `products`: `user_id`→`shop_id`, +slug, +soft delete, +sold_count
 - [ ] `product_variants` (giá + tồn kho) + `product_images` (bỏ json 1 ô)
 - [ ] Danh mục cây (`parent_id`) + `commission_rate` theo ngành hàng
 - [ ] Giỏ hàng server-side (`carts` / `cart_items`)
-- [ ] **Vá 4 lỗi chặn:** giá tính từ DB · IDOR update profile · nền tảng đơn thật · tồn kho
+- [~] **Vá 4 lỗi chặn:** ~~IDOR update profile~~ (T7 xong: +chống leo quyền, +ẩn password);
+      giá tính từ DB · nền tảng đơn thật · tồn kho → dời P1 (sống trong checkout/orders)
 - [ ] API Resources (envelope thống nhất, ẩn field nhạy cảm)
 
 ### P1 — Đơn hàng & lõi tiền  ☐
@@ -60,6 +61,20 @@ Sau phase này: có shop, sản phẩm đúng chuẩn, giỏ server, hết 4 l�
 - [ ] Index DB + eager load diệt N+1; Scout + Meilisearch
 - [ ] Queue/Horizon; ảnh lên S3 + resize + CDN
 - [ ] Test (Pest) cho tiền/đơn/thanh toán; Sentry + health check
+
+## Track song song: Admin blade (UI vận hành)
+
+Admin = blade (giữ). Mỗi phase backend xong → thêm màn admin tương ứng NGAY SAU
+(admin cần vận hành sớm, không dồn cuối). Hiện admin mới có CRUD cơ bản
+(product/user/category/brand/blog/country/history) + dashboard rỗng.
+
+Cần thêm khi backend tới:
+- [ ] (sau P0) Quản lý shop: duyệt pending→active; danh mục + `commission_rate`
+- [ ] (sau P1) Xem tất cả đơn / shop_orders; bảng phí `shop_order_fees`
+- [ ] (sau P2) Duyệt rút tiền (payout); đối soát ví
+- [ ] (sau P3) Xử lý tranh chấp/hoàn tiền; duyệt review
+- [ ] Dashboard doanh thu sàn thật (thay dashboard rỗng); quản lý seller
+- Lưu ý: admin KHÔNG tạo user (user tự đăng ký ở client) — đúng thực tế sàn.
 
 ## Không làm (thừa ở quy mô 10k)
 microservices · sharding · read-replica · kubernetes · event-sourcing · GraphQL · kafka

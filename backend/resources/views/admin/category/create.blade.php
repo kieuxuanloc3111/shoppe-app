@@ -32,6 +32,28 @@
                         </div>
 
                         <div class="form-group">
+                            <label class="col-md-12">Danh mục cha (để trống = gốc)</label>
+                            <div class="col-md-12">
+                                <select name="parent_id" class="form-control form-control-line">
+                                    <option value="">— Không (danh mục gốc) —</option>
+                                    @foreach($categories as $c)
+                                        <option value="{{ $c->id }}">{{ $c->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-12">Hoa hồng (%)</label>
+                            <div class="col-md-12">
+                                <input type="number" step="0.01" min="0" max="100"
+                                       name="commission_rate"
+                                       value="0"
+                                       class="form-control form-control-line">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
                             <button class="btn btn-success text-white">Save</button>
                             <a href="{{ route('admin.category.index') }}"
                                class="btn btn-secondary">Back</a>

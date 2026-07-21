@@ -16,18 +16,22 @@ class CategoryController extends Controller
 
     public function create()
     {
-        return view('admin.category.create');
+        return view('admin.category.create', [
+            'categories' => Category::orderBy('name')->get(),
+        ]);
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required'
+        $data = $request->validate([
+            'name'            => 'required|string|max:255',
+            'parent_id'       => 'nullable|exists:categories,id',
+            'commission_rate' => 'nullable|numeric|min:0|max:100',
         ]);
 
-        Category::create([
-            'name' => $request->name
-        ]);
+        $data['commission_rate'] = $data['commission_rate'] ?? 0;
+
+        Category::create($data); // slug tự sinh trong model
 
         return redirect()->route('admin.category.index');
     }
@@ -35,19 +39,25 @@ class CategoryController extends Controller
     public function edit($id)
     {
         $category = Category::findOrFail($id);
-        return view('admin.category.edit', compact('category'));
+
+        return view('admin.category.edit', [
+            'category'   => $category,
+            // loại chính nó khỏi danh sách cha (không tự làm cha mình)
+            'categories' => Category::where('id', '<>', $id)->orderBy('name')->get(),
+        ]);
     }
 
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'name' => 'required'
+        $data = $request->validate([
+            'name'            => 'required|string|max:255',
+            'parent_id'       => 'nullable|exists:categories,id',
+            'commission_rate' => 'nullable|numeric|min:0|max:100',
         ]);
 
-        $category = Category::findOrFail($id);
-        $category->update([
-            'name' => $request->name
-        ]);
+        $data['commission_rate'] = $data['commission_rate'] ?? 0;
+
+        Category::findOrFail($id)->update($data);
 
         return redirect()->route('admin.category.index');
     }

@@ -45,7 +45,7 @@
                             <td>{{ $user->name }}</td>
                             <td>{{ $user->email }}</td>
                             <td>
-                                @if($user->level == 1)
+                                @if($user->role === 'admin')
                                     <span class="badge bg-danger">Admin</span>
                                 @else
                                     <span class="badge bg-success">Member</span>

@@ -10,6 +10,8 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Password;
+use App\Http\Resources\UserResource;
 // use Intervention\Image\Facades\Image;
 class AuthController extends Controller
 {
@@ -51,13 +53,13 @@ class AuthController extends Controller
             'password' => Hash::make($data['password']),
             'phone' => $data['phone'] ?? null,
             'address' => $data['address'] ?? null,
-            'level' => 0,
+            'role' => 'user',
             'avatar' => $avatarName
         ]);
 
         return response()->json([
             'message' => 'success',
-            'Auth' => $user
+            'Auth' => new UserResource($user)
         ]);
     }
     public function login(LoginRequest $request)
@@ -65,7 +67,7 @@ class AuthController extends Controller
         $login = [
             'email'    => $request->email,
             'password' => $request->password,
-            'level'    => 0,
+            'role'     => 'user',
         ];
 
         $remember = $request->filled('remember_me');
@@ -79,7 +81,7 @@ class AuthController extends Controller
             return response()->json([
                 'success' => 'success',
                 'token'   => $token,
-                'Auth'    => $user
+                'Auth'    => new UserResource($user)
             ], $this->successStatus);
 
         } else {
@@ -89,5 +91,46 @@ class AuthController extends Controller
                 'errors'   => ['errors' => 'invalid email or password'],
             ], $this->successStatus);
         }
+    }
+
+    // client-only reset (React). Admin (level=1) has no self-service reset.
+    public function forgotPassword(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+
+        // only members get a link; admin emails are ignored silently
+        $user = User::where('email', $request->email)->first();
+        if ($user && $user->role === 'user') {
+            Password::sendResetLink($request->only('email'));
+        }
+
+        // same response either way — no user/level enumeration
+        return response()->json([
+            'response' => 'success',
+            'message'  => 'If that email is registered, a reset link has been sent.',
+        ], $this->successStatus);
+    }
+
+    // ported from Frontend\ForgotPasswordController@updatePassword
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'token'    => 'required',
+            'email'    => 'required|email',
+            'password' => 'required|min:6|confirmed',
+        ]);
+
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->password = Hash::make($password);
+                $user->save();
+            }
+        );
+
+        return response()->json([
+            'response' => $status === Password::PASSWORD_RESET ? 'success' : 'error',
+            'message'  => __($status),
+        ], $this->successStatus);
     }
 }

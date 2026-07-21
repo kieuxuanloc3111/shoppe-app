@@ -3,35 +3,59 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class Products extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'products';
 
     protected $fillable = [
-        'name',
-        'price',
-        'sale',
-        'sale_price',
-        'company',
-        'detail',
-        'status',     
+        'shop_id',
         'category_id',
         'brand_id',
-        'image',
-        'user_id',
+        'name',
+        'slug',
+        'description',
+        'is_active',
     ];
-
 
     protected $casts = [
-        'image' => 'array', 
+        'is_active'  => 'boolean',
+        'rating_avg' => 'decimal:2',
     ];
 
-    public $timestamps = true;
+    // giá hiển thị (khoảng giá của các variant) đi kèm khi trả JSON
+    protected $appends = ['price_min', 'price_max'];
 
-    /* ======================
-        RELATIONSHIP
-    ====================== */
+    protected static function booted(): void
+    {
+        static::creating(function (Products $p) {
+            if (empty($p->slug)) {
+                $p->slug = static::uniqueSlug($p->name);
+            }
+        });
+    }
+
+    public static function uniqueSlug(string $name): string
+    {
+        $base = Str::slug($name) ?: 'product';
+        $slug = $base;
+        $i = 2;
+        while (static::withTrashed()->where('slug', $slug)->exists()) {
+            $slug = $base . '-' . $i++;
+        }
+        return $slug;
+    }
+
+    /* ===== quan hệ ===== */
+
+    public function shop()
+    {
+        return $this->belongsTo(Shop::class);
+    }
 
     public function category()
     {
@@ -43,25 +67,31 @@ class Products extends Model
         return $this->belongsTo(Brand::class);
     }
 
-    public function user()
+    // FK chỉ định rõ vì model tên 'Products' (số nhiều) làm Eloquent đoán sai 'products_id'
+    public function images()
     {
-        return $this->belongsTo(User::class);
+        return $this->hasMany(ProductImage::class, 'product_id')->orderBy('sort_order');
     }
 
-    // Giá sau khi giảm
-    public function getFinalPriceAttribute()
+    public function variants()
     {
-        if ($this->sale_price > 0) {
-            return $this->price - ($this->price * $this->sale_price / 100);
-        }
-
-        return $this->price;
+        return $this->hasMany(ProductVariant::class, 'product_id');
     }
 
-    // Kiểm tra có sale hay không
-    public function getIsSaleAttribute()
+    public function options()
     {
-        return $this->sale_price > 0;
+        return $this->hasMany(ProductOption::class, 'product_id');
     }
 
+    /* ===== khoảng giá từ variants ===== */
+
+    public function getPriceMinAttribute()
+    {
+        return $this->variants->min('price');
+    }
+
+    public function getPriceMaxAttribute()
+    {
+        return $this->variants->max('price');
+    }
 }

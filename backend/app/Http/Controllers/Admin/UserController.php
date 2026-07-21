@@ -32,13 +32,13 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required',
             'email' => 'required|email',
-            'level' => 'required'
+            'role' => 'required|in:admin,user'
         ]);
 
         $data = [
             'name' => $request->name,
             'email' => $request->email,
-            'level' => $request->level,
+            'role' => $request->role,
             'phone' => $request->phone,
             'address' => $request->address
         ];
@@ -60,7 +60,7 @@ class UserController extends Controller
             return back()->with('error', 'Cannot delete yourself');
         }
 
-        if ($user->level == 1) {
+        if ($user->role === 'admin') {
             return back()->with('error', 'Cannot delete another admin');
         }
 

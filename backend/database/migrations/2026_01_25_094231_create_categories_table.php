@@ -13,7 +13,10 @@ return new class extends Migration
     {
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('parent_id')->nullable()->constrained('categories')->nullOnDelete();
             $table->string('name');
+            $table->string('slug')->unique();
+            $table->decimal('commission_rate', 5, 2)->default(0); // % hoa hồng ngành hàng
             $table->timestamps();
         });
 

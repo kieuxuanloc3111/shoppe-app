@@ -7,6 +7,12 @@ const Header = () => {
   const { cartCount } = useContext(CartContext); 
 
   const [isLogin, setIsLogin] = useState(false);
+  const [kw, setKw] = useState("");
+
+  const doSearch = (e) => {
+    e.preventDefault();
+    if (kw.trim()) navigate(`/search?keyword=${encodeURIComponent(kw.trim())}`);
+  };
 
   useEffect(() => {
     const checkLogin = () => {
@@ -205,7 +211,14 @@ const Header = () => {
 
               <div className="col-sm-3">
                 <div className="search_box pull-right">
-                  <input type="text" placeholder="Search" />
+                  <form onSubmit={doSearch}>
+                    <input
+                      type="text"
+                      placeholder="Search"
+                      value={kw}
+                      onChange={(e) => setKw(e.target.value)}
+                    />
+                  </form>
                 </div>
               </div>
 

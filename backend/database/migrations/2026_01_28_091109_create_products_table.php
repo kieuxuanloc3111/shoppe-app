@@ -11,43 +11,23 @@ return new class extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
 
-            // basic info
+            $table->foreignId('shop_id')->constrained()->onDelete('cascade');
+            $table->foreignId('category_id')->constrained()->onDelete('cascade');
+            $table->foreignId('brand_id')->constrained()->onDelete('cascade');
+
             $table->string('name');
-            $table->decimal('price', 15, 2);
+            $table->string('slug')->unique();
+            $table->text('description')->nullable();
 
-            // sale
-            $table->tinyInteger('sale')->default(0); // 0: new, 1: sale
-            $table->decimal('sale_price', 15, 2)->nullable();
+            $table->boolean('is_active')->default(true);
 
-            // info
-            $table->string('company');
-            $table->text('detail');
-
-            // image (json string)
-            $table->string('image'); // lưu json_encode
-
-            // relation
-            $table->unsignedBigInteger('category_id');
-            $table->unsignedBigInteger('brand_id');
-            $table->unsignedBigInteger('user_id');
+            // giá + tồn kho nằm ở product_variants, KHÔNG ở đây
+            $table->unsignedInteger('sold_count')->default(0);
+            $table->unsignedInteger('view_count')->default(0);
+            $table->decimal('rating_avg', 3, 2)->default(0);
 
             $table->timestamps();
-
-            /* ======================
-                FOREIGN KEY
-            ====================== */
-
-            $table->foreign('category_id')
-                  ->references('id')->on('categories')
-                  ->onDelete('cascade');
-
-            $table->foreign('brand_id')
-                  ->references('id')->on('brands')
-                  ->onDelete('cascade');
-
-            $table->foreign('user_id')
-                  ->references('id')->on('users')
-                  ->onDelete('cascade');
+            $table->softDeletes();
         });
     }
 

@@ -3,22 +3,24 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-// use Database\Seeders\CountrySeeder;
+use Illuminate\Support\Facades\Hash;
+
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
     /**
-     * Seed the application's database.
+     * Chỉ seed 1 tài khoản admin (để đăng nhập admin sau migrate:fresh).
+     * Không seed data rác. idempotent — chạy nhiều lần không nhân bản.
      */
     public function run(): void
     {
-        $this->call([
-            CategorySeeder::class,
-            BrandSeeder::class,
-        ]);
+        User::updateOrCreate(
+            ['email' => 'admin@test.com'],
+            [
+                'name'     => 'Admin',
+                'password' => Hash::make('123456'),
+                'role'     => 'admin',
+            ]
+        );
     }
-
 }

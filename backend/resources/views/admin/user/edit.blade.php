@@ -40,10 +40,10 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Level</label>
-                    <select name="level" class="form-control">
-                        <option value="1" {{ $user->level == 1 ? 'selected' : '' }}>Admin</option>
-                        <option value="0" {{ $user->level == 0 ? 'selected' : '' }}>Member</option>
+                    <label>Role</label>
+                    <select name="role" class="form-control">
+                        <option value="admin" {{ $user->role === 'admin' ? 'selected' : '' }}>Admin</option>
+                        <option value="user" {{ $user->role === 'user' ? 'selected' : '' }}>Member</option>
                     </select>
                 </div>
 

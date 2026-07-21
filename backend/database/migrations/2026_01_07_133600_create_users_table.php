@@ -14,16 +14,20 @@ return new class extends Migration {
             $table->string('email')->unique();
             $table->string('password');
 
-            $table->string('phone')->nullable();
-            $table->string('address')->nullable();
+            $table->enum('role', ['admin', 'user'])->default('user');
+            $table->enum('status', ['active', 'banned'])->default('active');
+            $table->timestamp('email_verified_at')->nullable();
+
+            $table->string('phone', 20)->nullable();
+            $table->string('address', 500)->nullable();
             $table->string('avatar')->nullable();
             $table->unsignedBigInteger('id_country')->nullable();
 
             $table->timestamps();
 
+            $table->rememberToken();
         });
     }
-
 
     public function down(): void
     {

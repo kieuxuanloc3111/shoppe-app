@@ -41,10 +41,10 @@ Sau phase này: có shop, sản phẩm đúng chuẩn, giỏ server, hết 4 l�
 - [x] API Resources + `/api/v1` (envelope curate, ẩn field nhạy cảm)  *(T8 xong)*
 
 ### P1 — Đơn hàng & lõi tiền  ☐
-- [ ] `orders` / `shop_orders` / `order_items` — tách đơn theo shop
+- [~] `orders` / `shop_orders` / `order_items` — tách đơn theo shop  *(T1: schema+models xong; logic tách ở T2)*
 - [ ] Trừ tồn kho atomic trong transaction; state machine vòng đời đơn
-- [ ] `seller_wallets` + `wallet_ledger` (sổ cái bất biến)
-- [ ] Bộ máy hoa hồng/phí cấu hình được + `shop_order_fees`
+- [~] `seller_wallets` + `wallet_ledger` (sổ cái bất biến)  *(T1: bảng+model xong; service ở T4)*
+- [~] Bộ máy hoa hồng/phí cấu hình được + `shop_order_fees`  *(T1: bảng xong; calculator ở T3)*
 
 ### P2 — Thanh toán ký quỹ  ☐
 - [ ] Tích hợp VNPay (redirect + verify callback/IPN chữ ký)
@@ -61,6 +61,34 @@ Sau phase này: có shop, sản phẩm đúng chuẩn, giỏ server, hết 4 l�
 - [ ] Index DB + eager load diệt N+1; Scout + Meilisearch
 - [ ] Queue/Horizon; ảnh lên S3 + resize + CDN
 - [ ] Test (Pest) cho tiền/đơn/thanh toán; Sentry + health check
+
+---
+
+## Định hướng tương lai (CHƯA làm — chỉ đánh dấu)
+
+Cả hai là LỚP giá trị trên nền commerce đã chạy + có traffic/data. Không làm khi chưa có đơn/tiền/người dùng thật (YAGNI). Thêm sau khi P1–P4 xong.
+
+### P5 — Realtime (sau P4)
+Tech: Laravel **Reverb** (WebSocket built-in) hoặc Pusher. 10k user gánh dư.
+
+| Tính năng | Giá trị |
+|-----------|---------|
+| Chat mua ↔ bán (như Shopee Chat) | cao — gần bắt buộc |
+| Thông báo realtime (đơn mới, đã giao, tin nhắn) | cao |
+| Cập nhật tồn kho/giá live | thấp |
+| Flash sale countdown / live sell | nâng cao, sau |
+
+### P6 — AI (muộn hơn, chọn lọc)
+Cần data hành vi + hệ chạy thật trước. Không theo hype — chỉ làm cái đẩy được metric.
+
+| AI | Giá trị | Điều kiện |
+|----|---------|-----------|
+| Gợi ý sản phẩm (recommendation) | cao (tăng bán) | cần data mua/xem |
+| Semantic search | vừa | nâng cấp Meilisearch (P4) |
+| Seller: tự sinh mô tả/tiêu đề SP (LLM) | vừa-cao | làm sớm được |
+| Tóm tắt / lọc review giả | vừa | khi nhiều review |
+| Chatbot hỗ trợ | vừa | sau |
+| Chống gian lận (fraud) | cao | khi có tiền thật chạy |
 
 ## Track song song: Admin blade (UI vận hành)
 

@@ -183,3 +183,31 @@ giỏ server · vá IDOR+leo-quyền · API Resources + /api/v1 · seeder admin.
 Tiếp theo: P1 (orders/shop_orders/order_items + ví + bộ máy phí). Nhớ: P1 dùng migration MỚI (alter),
 chỉ `php artisan migrate`, khỏi fresh.
 
+## 2026-07-18 — Ghi định hướng P5 (realtime) + P6 (AI) vào ROADMAP
+- **Làm gì:** Thêm P5 (chat/thông báo realtime — Reverb) và P6 (AI: recommendation, semantic
+  search, seller content-gen, fraud...) vào ROADMAP dưới mục "Định hướng tương lai — CHƯA làm".
+- **Vì sao:** User hỏi sao roadmap không có AI/realtime. Chúng là lớp trên nền commerce + cần
+  traffic/data → đánh dấu định hướng, làm sau P1–P4. Không làm giờ (YAGNI).
+- **File đụng:** ai-workspace/ROADMAP.md
+
+## 2026-07-18 — Lên plan P1 (đơn hàng & lõi tiền)
+- **Làm gì:** Chia P1 thành 6 task (schema đơn+tiền → checkout → phí → ví → state machine → query).
+  Chốt giả định: VNPay=P2 (P1 mark-paid tay), trừ kho lúc đặt, escrow, ship=0. Vá 3 bug P0 còn lại
+  ở T2 (giá từ DB, đơn thật, kho atomic). Export file plan.
+- **Vì sao:** Plan trước khi code (như P0).
+- **File đụng:** ai-workspace/plans/p1-orders-money-2026-07-18.md (mới)
+
+## 2026-07-18 — P1/T1: schema đơn + tiền (migrations + models)
+- **Làm gì:** 2 migration MỚI (bảng mới hết → chỉ `migrate`): orders/shop_orders/order_items;
+  fee_settings/shop_order_fees/seller_wallets/wallet_ledger. 7 model + quan hệ. order_items snapshot
+  name+unit_price; product_id/variant_id nullable nullOnDelete (giữ lịch sử đơn khi SP/variant bị
+  xóa/sửa). FeeSetting::current() (firstOrCreate 1 dòng). FK chỉ định rõ ('product_id','variant_id',
+  'buyer_id') do model số nhiều/khác tên.
+- **Vì sao:** Nền dữ liệu đơn + escrow + hoa hồng cho P1.
+- **Verify:** test order→shop_order→item, ví+ledger+fee, FeeSetting::current — pass 3/3, đã xóa.
+  (Fix: tạo lại tests/Unit/.gitkeep — phpunit cần thư mục.)
+- **File đụng:** 2 migration (orders, wallet+fee), 7 model (Order/ShopOrder/OrderItem/FeeSetting/
+  ShopOrderFee/SellerWallet/WalletLedger).
+- **Nợ:** T4 updateProduct hard-delete variants → order_items.variant_id thành null (snapshot vẫn
+  giữ). Sau nên soft-delete/không-xóa variant đã có đơn.
+

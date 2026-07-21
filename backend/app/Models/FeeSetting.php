@@ -14,9 +14,13 @@ class FeeSetting extends Model
         'infra_fee_amount' => 'decimal:2',
     ];
 
-    // luôn lấy dòng cấu hình hiện hành (tạo mặc định nếu chưa có)
+    // luôn lấy dòng cấu hình hiện hành (tạo mặc định theo Shopee VN nếu chưa có)
     public static function current(): self
     {
-        return static::firstOrCreate([]);
+        return static::firstOrCreate([], [
+            'payment_fee_rate' => 5,    // %
+            'tech_fee_rate'    => 5,    // %
+            'infra_fee_amount' => 3000, // đ/đơn
+        ]);
     }
 }

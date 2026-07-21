@@ -222,3 +222,13 @@ chỉ `php artisan migrate`, khỏi fresh.
   đơn không tạo), giỏ trống→400 — pass 4/4, đã xóa.
 - **File đụng:** Api/CheckoutController (route /api/v1/checkout sẵn có).
 
+## 2026-07-18 — P1/T3: bộ máy phí (FeeCalculator)
+- **Làm gì:** Service `App\Services\FeeCalculator` bóc phí 1 shop_order: commission theo
+  category.commission_rate từng item + payment/tech (% trên subtotal) + infra (cố định) →
+  platform_total, seller_earning → ghi shop_order_fees (updateOrCreate). FeeSetting::current()
+  default Shopee VN (payment 5%, tech 5%, infra 3000đ). Admin-edit fee_settings = admin-track (skip).
+- **Vì sao:** Tính hoa hồng/phí sàn cho escrow (T5 gọi khi đơn completed).
+- **Verify:** test khớp ví dụ design doc (đơn 500k, hoa hồng 4% → seller 427k), gọi lại không
+  tạo trùng — pass 2/2, đã xóa.
+- **File đụng:** app/Services/FeeCalculator.php (mới), app/Models/FeeSetting.php.
+

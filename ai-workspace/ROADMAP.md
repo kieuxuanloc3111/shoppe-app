@@ -43,7 +43,7 @@ Sau phase này: có shop, sản phẩm đúng chuẩn, giỏ server, hết 4 l�
 - [x] `orders` / `shop_orders` / `order_items` — tách đơn theo shop  *(T1 schema + T2 checkout xong)*
 - [ ] Trừ tồn kho atomic trong transaction; state machine vòng đời đơn
 - [~] `seller_wallets` + `wallet_ledger` (sổ cái bất biến)  *(T1: bảng+model xong; service ở T4)*
-- [~] Bộ máy hoa hồng/phí cấu hình được + `shop_order_fees`  *(T1: bảng xong; calculator ở T3)*
+- [x] Bộ máy hoa hồng/phí cấu hình được + `shop_order_fees`  *(T3: FeeCalculator xong; admin-edit fee = admin-track)*
 
 ### P2 — Thanh toán ký quỹ  ☐
 - [ ] Tích hợp VNPay (redirect + verify callback/IPN chữ ký)

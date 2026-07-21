@@ -9,6 +9,7 @@ use App\Models\ProductVariant;
 use App\Models\ProductOption;
 use App\Models\Category;
 use App\Models\Brand;
+use App\Http\Resources\ProductResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Intervention\Image\ImageManager;
@@ -29,7 +30,7 @@ class ProductController extends Controller
             ->take(6)
             ->get();
 
-        return response()->json(['response' => 'success', 'data' => $products], $this->successStatus);
+        return response()->json(['response' => 'success', 'data' => ProductResource::collection($products)], $this->successStatus);
     }
 
     public function categoryBrand()
@@ -50,7 +51,7 @@ class ProductController extends Controller
 
         $product->increment('view_count');
 
-        return response()->json(['response' => 'success', 'data' => $product], $this->successStatus);
+        return response()->json(['response' => 'success', 'data' => new ProductResource($product)], $this->successStatus);
     }
 
     public function search(Request $request)

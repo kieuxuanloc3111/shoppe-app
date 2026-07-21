@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Shop;
+use App\Http\Resources\ShopResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -40,7 +41,7 @@ class ShopController extends Controller
 
         return response()->json([
             'response' => 'success',
-            'data'     => $shop,
+            'data'     => new ShopResource($shop),
         ], 201);
     }
 
@@ -51,7 +52,7 @@ class ShopController extends Controller
 
         return response()->json([
             'response' => 'success',
-            'data'     => $shop,
+            'data'     => new ShopResource($shop),
         ]);
     }
 
@@ -70,7 +71,7 @@ class ShopController extends Controller
 
         return response()->json([
             'response' => 'success',
-            'data'     => $shop,
+            'data'     => new ShopResource($shop),
         ]);
     }
 

@@ -48,3 +48,7 @@ ai-workspace/
 
 7. **Test là công cụ dùng-một-lần.** Viết test verify task → chạy `php artisan test` cho pass
    → XÓA file test. Không giữ lại (repo nhẹ). AI tự chạy test để verify trước khi xóa.
+
+8. **Migration:** nếu SỬA/ĐỔI TÊN create-migration đã chạy → người dùng phải `migrate:fresh`
+   (xóa data, chạy lại từ đầu). Chỉ `migrate` khi THÊM migration mới hoàn toàn.
+   AI phải ghi rõ "fresh" hay "migrate" trong mỗi hướng dẫn test.

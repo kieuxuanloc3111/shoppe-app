@@ -28,17 +28,17 @@ Thiết kế tổng thể: xem design doc (artifact) — ERD, dòng tiền ký q
 
 ## Phase
 
-### P0 — Nền tảng vai trò & catalog  ☐
+### P0 — Nền tảng vai trò & catalog  ✅ XONG (2026-07-18)
 Sau phase này: có shop, sản phẩm đúng chuẩn, giỏ server, hết 4 lỗi chặn.
 - [x] `users.level` → `users.role` (admin/user) + status + email verify  *(T1 xong)*
 - [x] Bảng `shops` + onboarding người bán; middleware `role` / `seller`  *(T1+T2 xong)*
 - [x] `products`: `user_id`→`shop_id`, +slug, +soft delete, +sold_count  *(T4 xong)*
 - [x] `product_variants` (giá + tồn kho) + `product_images` (bỏ json 1 ô)  *(T5 gộp vào T4)*
 - [x] Danh mục cây (`parent_id`) + `commission_rate` theo ngành hàng  *(T3 xong)*
-- [ ] Giỏ hàng server-side (`carts` / `cart_items`)
+- [x] Giỏ hàng server-side (`carts` / `cart_items`)  *(T6 xong)*
 - [~] **Vá 4 lỗi chặn:** ~~IDOR update profile~~ (T7 xong: +chống leo quyền, +ẩn password);
       giá tính từ DB · nền tảng đơn thật · tồn kho → dời P1 (sống trong checkout/orders)
-- [ ] API Resources (envelope thống nhất, ẩn field nhạy cảm)
+- [x] API Resources + `/api/v1` (envelope curate, ẩn field nhạy cảm)  *(T8 xong)*
 
 ### P1 — Đơn hàng & lõi tiền  ☐
 - [ ] `orders` / `shop_orders` / `order_items` — tách đơn theo shop

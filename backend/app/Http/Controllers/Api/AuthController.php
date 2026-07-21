@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Password;
+use App\Http\Resources\UserResource;
 // use Intervention\Image\Facades\Image;
 class AuthController extends Controller
 {
@@ -58,7 +59,7 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'success',
-            'Auth' => $user
+            'Auth' => new UserResource($user)
         ]);
     }
     public function login(LoginRequest $request)
@@ -80,7 +81,7 @@ class AuthController extends Controller
             return response()->json([
                 'success' => 'success',
                 'token'   => $token,
-                'Auth'    => $user
+                'Auth'    => new UserResource($user)
             ], $this->successStatus);
 
         } else {

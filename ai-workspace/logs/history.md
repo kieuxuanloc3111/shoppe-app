@@ -142,3 +142,44 @@ Ghi mới thêm vào cuối. Mới nhất ở dưới cùng.
   Products/ProductImage/ProductVariant/ProductOption/Shop models, Api/ProductController, routes/api.php
 - **Nợ (admin-track):** admin blade product index/edit hiển thị thiếu (field cũ) → rewrite sau P0.
 
+## 2026-07-18 — P0/T6: giỏ hàng server-side
+- **Làm gì:** Bảng `carts` (1/user) + `cart_items` (variant_id, qty, unique[cart,variant]).
+  Models Cart/CartItem (CartItem.variant FK chỉ định 'variant_id'). Api/CartController:
+  GET/POST(add)/PUT(update)/DELETE(remove) /api/cart. Giá LUÔN từ DB (endpoint chỉ nhận
+  variant_id+qty, bỏ qua giá client), chặn qty>stock (422), gộp variant trùng, ownership
+  item (chống IDOR). Route trong nhóm auth:sanctum.
+- **Vì sao:** Giỏ cũ chỉ localStorage + tin giá client (lỗ price-tampering). Server-side + variant.
+- **Verify:** test giá-từ-DB, bỏ-giá-client, chặn-tồn-kho, gộp-trùng, ownership — pass 5/5, đã xóa.
+- **File đụng:** migration carts, Cart, CartItem, Api/CartController, routes/api.php
+- **Ghi chú:** endpoint cũ /product/cart (productCart) vẫn còn cho frontend cũ — thay hẳn khi dọn frontend.
+
+## 2026-07-18 — Seeder admin + đổi cách migration
+- **Làm gì:** DatabaseSeeder chỉ seed 1 admin (admin@test.com/123456, updateOrCreate idempotent),
+  bỏ CategorySeeder/BrandSeeder khỏi run (data rác "truyện tranh" + CategorySeeder dùng raw insert
+  → không sinh slug → vỡ). Giờ `migrate:fresh --seed` = reset + có admin, khỏi tinker tay.
+- **Vì sao:** User ngại tạo admin lại mỗi lần fresh. Lỗi migrate: do đã đổi tên+sửa create cũ
+  (shops rename, products/categories sửa) → plain migrate xung đột "shops already exists".
+- **Quyết định:** từ P1 trở đi ưu tiên MIGRATION MỚI (alter) thay vì sửa create cũ → chỉ cần
+  `php artisan migrate`, giữ data, khỏi fresh (đã ghi CLAUDE.md #8).
+- **File đụng:** database/seeders/DatabaseSeeder.php
+
+## 2026-07-18 — P0/T8: API Resources + /api/v1 → P0 HOÀN TẤT
+- **Làm gì:** apiPrefix 'api/v1' (bootstrap/app.php) → mọi route API giờ /api/v1/*. Tạo Resource
+  UserResource (ẩn password/remember_token/timestamp), ShopResource, CategoryResource (children
+  đệ quy), ProductResource (price_min/max, images/variants/options whenLoaded). Áp: Auth
+  register/login (UserResource), Product product()/detail(), Shop store/show/update, Category index.
+  Search/paginate/seller-CRUD giữ raw (đã có price_min qua $appends; giữ pagination meta) —
+  có thể áp Resource dần.
+- **Vì sao:** Output curate nhất quán + versioning production. (Field nhạy cảm đã ẩn từ T1 qua $hidden.)
+- **Verify:** test /v1 áp dụng (/api trần 404), login không lộ password, product resource gọn
+  (có price_min, bỏ created_at) — pass 3/3, đã xóa.
+- **File đụng:** bootstrap/app.php, 4 Resource mới, Api Auth/Product/Shop/Category controllers.
+- **⚠️ FRONTEND VỠ:** React gọi /api/... → giờ /api/v1/... → 404. Cần đổi base URL khi dọn frontend
+  (đằng nào React cũng phải rewrite cho schema marketplace: shop/variant).
+
+## ✅ P0 HOÀN TẤT (T1–T8)
+Vai trò (role) · shops + seller · danh mục cây + hoa hồng · products+variants+options+ảnh ·
+giỏ server · vá IDOR+leo-quyền · API Resources + /api/v1 · seeder admin.
+Tiếp theo: P1 (orders/shop_orders/order_items + ví + bộ máy phí). Nhớ: P1 dùng migration MỚI (alter),
+chỉ `php artisan migrate`, khỏi fresh.
+

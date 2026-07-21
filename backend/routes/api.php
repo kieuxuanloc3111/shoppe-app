@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\BlogController;
 use App\Http\Controllers\Api\CheckoutController;
 use App\Http\Controllers\Api\ShopController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\CartController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login',    [AuthController::class, 'login']);
@@ -43,6 +44,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/user/product/{id}', [ProductController::class, 'getProduct']);
         Route::post('/user/product/update/{id}', [ProductController::class, 'updateProduct']);
     });
+
+    // giỏ hàng server (buyer) — giá lấy từ DB, chặn vượt kho
+    Route::get('/cart', [CartController::class, 'index']);
+    Route::post('/cart', [CartController::class, 'add']);
+    Route::put('/cart/{item}', [CartController::class, 'update']);
+    Route::delete('/cart/{item}', [CartController::class, 'remove']);
 
     Route::post('/blog/comment/{id}', [BlogController::class,'storeComment']);
 });

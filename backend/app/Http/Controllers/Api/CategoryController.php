@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Http\Resources\CategoryResource;
 
 class CategoryController extends Controller
 {
@@ -16,7 +17,7 @@ class CategoryController extends Controller
 
         return response()->json([
             'response' => 'success',
-            'data'     => $tree,
+            'data'     => CategoryResource::collection($tree),
         ]);
     }
 }

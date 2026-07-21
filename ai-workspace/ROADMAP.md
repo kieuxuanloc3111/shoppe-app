@@ -36,12 +36,11 @@ Sau phase này: có shop, sản phẩm đúng chuẩn, giỏ server, hết 4 l�
 - [x] `product_variants` (giá + tồn kho) + `product_images` (bỏ json 1 ô)  *(T5 gộp vào T4)*
 - [x] Danh mục cây (`parent_id`) + `commission_rate` theo ngành hàng  *(T3 xong)*
 - [x] Giỏ hàng server-side (`carts` / `cart_items`)  *(T6 xong)*
-- [~] **Vá 4 lỗi chặn:** ~~IDOR update profile~~ (T7 xong: +chống leo quyền, +ẩn password);
-      giá tính từ DB · nền tảng đơn thật · tồn kho → dời P1 (sống trong checkout/orders)
+- [x] **Vá 4 lỗi chặn:** ~~IDOR (P0/T7)~~ · ~~giá từ DB · đơn thật · trừ kho atomic (P1/T2)~~ — XONG hết
 - [x] API Resources + `/api/v1` (envelope curate, ẩn field nhạy cảm)  *(T8 xong)*
 
 ### P1 — Đơn hàng & lõi tiền  ☐
-- [~] `orders` / `shop_orders` / `order_items` — tách đơn theo shop  *(T1: schema+models xong; logic tách ở T2)*
+- [x] `orders` / `shop_orders` / `order_items` — tách đơn theo shop  *(T1 schema + T2 checkout xong)*
 - [ ] Trừ tồn kho atomic trong transaction; state machine vòng đời đơn
 - [~] `seller_wallets` + `wallet_ledger` (sổ cái bất biến)  *(T1: bảng+model xong; service ở T4)*
 - [~] Bộ máy hoa hồng/phí cấu hình được + `shop_order_fees`  *(T1: bảng xong; calculator ở T3)*

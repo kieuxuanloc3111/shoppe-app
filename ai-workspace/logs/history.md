@@ -211,3 +211,14 @@ chỉ `php artisan migrate`, khỏi fresh.
 - **Nợ:** T4 updateProduct hard-delete variants → order_items.variant_id thành null (snapshot vẫn
   giữ). Sau nên soft-delete/không-xóa variant đã có đơn.
 
+## 2026-07-18 — P1/T2: checkout (đặt hàng) — VÁ 3 BUG P0 CÒN LẠI
+- **Làm gì:** Rewrite Api/CheckoutController. Từ giỏ server → trong DB transaction: khóa variant
+  (lockForUpdate) → kiểm+trừ kho atomic (chống oversell) → tạo order + tách shop_orders theo shop
+  + order_items (snapshot name+giá). **Giá lấy TỪ DB** (bỏ giá client). grand_total tính server.
+  Dọn giỏ. payment_status=pending (VNPay ở P2). Bỏ History/Mail cũ.
+- **Vì sao:** 3 bug P0 sống trong checkout: giá client (price-tampering), đơn giả (chỉ History),
+  không trừ kho. Giờ vá hết.
+- **Verify:** test tách-đơn-đa-shop + trừ kho, giá-từ-DB, oversell→422+rollback (kho không trừ,
+  đơn không tạo), giỏ trống→400 — pass 4/4, đã xóa.
+- **File đụng:** Api/CheckoutController (route /api/v1/checkout sẵn có).
+

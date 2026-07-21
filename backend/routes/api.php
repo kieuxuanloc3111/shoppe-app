@@ -34,13 +34,16 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/seller/shop', [ShopController::class, 'update'])->middleware('seller');
 
     Route::post('/user/update/{id}',[MemberController::class, 'updateProfile']);
-    Route::post('/user/product/add', [ProductController::class, 'addProduct']);
-    Route::get('/user/my-product', [ProductController::class, 'myProduct']);
 
-    Route::get('/user/product/delete/{id}', [ProductController::class, 'deleteProduct']);
-    Route::get('/user/product/{id}', [ProductController::class, 'getProduct']);
+    // quản lý sản phẩm — chỉ người bán (có shop active)
+    Route::middleware('seller')->group(function () {
+        Route::post('/user/product/add', [ProductController::class, 'addProduct']);
+        Route::get('/user/my-product', [ProductController::class, 'myProduct']);
+        Route::get('/user/product/delete/{id}', [ProductController::class, 'deleteProduct']);
+        Route::get('/user/product/{id}', [ProductController::class, 'getProduct']);
+        Route::post('/user/product/update/{id}', [ProductController::class, 'updateProduct']);
+    });
 
-    Route::post('/user/product/update/{id}', [ProductController::class, 'updateProduct']);
     Route::post('/blog/comment/{id}', [BlogController::class,'storeComment']);
 });
 

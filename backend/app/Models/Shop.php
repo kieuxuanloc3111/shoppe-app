@@ -20,5 +20,8 @@ class Shop extends Model
         return $this->belongsTo(User::class);
     }
 
-    // quan hệ products() thêm ở T4 (khi products có shop_id)
+    public function products()
+    {
+        return $this->hasMany(Products::class);
+    }
 }

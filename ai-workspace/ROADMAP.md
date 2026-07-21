@@ -32,8 +32,8 @@ Thiết kế tổng thể: xem design doc (artifact) — ERD, dòng tiền ký q
 Sau phase này: có shop, sản phẩm đúng chuẩn, giỏ server, hết 4 lỗi chặn.
 - [x] `users.level` → `users.role` (admin/user) + status + email verify  *(T1 xong)*
 - [x] Bảng `shops` + onboarding người bán; middleware `role` / `seller`  *(T1+T2 xong)*
-- [ ] `products`: `user_id`→`shop_id`, +slug, +soft delete, +sold_count
-- [ ] `product_variants` (giá + tồn kho) + `product_images` (bỏ json 1 ô)
+- [x] `products`: `user_id`→`shop_id`, +slug, +soft delete, +sold_count  *(T4 xong)*
+- [x] `product_variants` (giá + tồn kho) + `product_images` (bỏ json 1 ô)  *(T5 gộp vào T4)*
 - [x] Danh mục cây (`parent_id`) + `commission_rate` theo ngành hàng  *(T3 xong)*
 - [ ] Giỏ hàng server-side (`carts` / `cart_items`)
 - [~] **Vá 4 lỗi chặn:** ~~IDOR update profile~~ (T7 xong: +chống leo quyền, +ẩn password);
@@ -70,6 +70,9 @@ Admin = blade (giữ). Mỗi phase backend xong → thêm màn admin tương ứ
 
 Cần thêm khi backend tới:
 - [ ] (sau P0) Quản lý shop: duyệt pending→active; danh mục + `commission_rate`
+- [ ] (sau P0) **Rewrite quản lý sản phẩm admin** theo shop+variant — hiện index/edit
+      hiển thị thiếu (giá dời xuống variant, ảnh sang bảng riêng). Admin nên chỉ xem/ẩn,
+      không sửa giá (seller tự quản)
 - [ ] (sau P1) Xem tất cả đơn / shop_orders; bảng phí `shop_order_fees`
 - [ ] (sau P2) Duyệt rút tiền (payout); đối soát ví
 - [ ] (sau P3) Xử lý tranh chấp/hoàn tiền; duyệt review

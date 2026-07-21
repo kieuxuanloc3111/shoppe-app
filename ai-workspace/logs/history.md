@@ -121,3 +121,24 @@ Ghi mới thêm vào cuối. Mới nhất ở dưới cùng.
 - **File đụng:** create_categories migration, Category, Api/CategoryController, Admin/CategoryController,
   category create+edit blade, routes/api.php
 
+## 2026-07-18 — P0/T4 (gộp T5): products viết lại + variants + options + ảnh
+- **Làm gì:** Rewrite toàn bộ module product sang marketplace.
+  - Migration: đổi shops → 2026_01_27 (chạy trước products để FK). products: user_id→shop_id,
+    +slug/description/is_active/sold_count/view_count/rating_avg/softDeletes; BỎ price/sale/
+    sale_price/company/image/status (giá+kho dời xuống variant). Thêm bảng product_images,
+    product_options, product_variants.
+  - Models: Products (rewrite: SoftDeletes, slug auto, appends price_min/price_max từ variants,
+    quan hệ shop/category/brand/images/variants/options — FK chỉ định 'product_id' vì tên model
+    'Products' số nhiều làm Eloquent đoán sai). ProductImage/Variant/Option mới. Shop.products().
+  - Api/ProductController rewrite hết: product/detail/search/advancedSearch/filterPrice (lọc giá
+    qua whereHas variants), myProduct/getProduct/addProduct/updateProduct/deleteProduct
+    (shop-scoped, transaction, variants+options+ảnh; soft delete). productCart tạm dùng price_min
+    (đổi theo variant ở T6).
+  - Routes: nhóm quản lý sản phẩm bọc middleware 'seller'.
+- **Vì sao:** T4 bỏ price khỏi products bắt buộc có variant → gộp T5. Sàn cần 1 SP nhiều phân loại.
+- **Verify:** test tạo SP có variant (price_min/max), non-seller 403, ownership 403, list khoảng giá
+  — pass 4/4, đã xóa. (Fix dọc đường: FK products_id→product_id.)
+- **File đụng:** 4 migration (shops rename + products rewrite + images/options/variants),
+  Products/ProductImage/ProductVariant/ProductOption/Shop models, Api/ProductController, routes/api.php
+- **Nợ (admin-track):** admin blade product index/edit hiển thị thiếu (field cũ) → rewrite sau P0.
+

@@ -232,3 +232,21 @@ chỉ `php artisan migrate`, khỏi fresh.
   tạo trùng — pass 2/2, đã xóa.
 - **File đụng:** app/Services/FeeCalculator.php (mới), app/Models/FeeSetting.php.
 
+## 2026-07-18 — P1/T4: ví + sổ cái (WalletService)
+- **Làm gì:** Service `App\Services\WalletService`: apply(shop,type,amount,ref) cộng/trừ
+  `available` + ghi 1 dòng wallet_ledger (balance_after), khóa ví lockForUpdate chống race.
+  Tiện: creditSale (cộng khi completed), debitPayout (trừ khi rút). `pending` để dành escrow P2.
+- **Vì sao:** Số dư seller = sổ cái bút toán bất biến, đối soát được.
+- **Verify:** cộng dồn + balance_after đúng, rút trừ available (bút toán âm) — pass 2/2, đã xóa.
+- **File đụng:** app/Services/WalletService.php (mới).
+
+## 2026-07-18 — P1/T5: vòng đời đơn (state machine)
+- **Làm gì:** Api/OrderController: seller confirm (pending→confirmed), ship (confirmed→shipping);
+  buyer received (shipping→completed → FeeCalculator + WalletService.creditSale, trong transaction),
+  cancel (pending/confirmed → cancelled + hoàn kho). Guard: seller chỉ đơn shop mình, buyer chỉ đơn
+  mình; transition sai → 422. Routes: seller trong nhóm 'seller', buyer trong auth:sanctum.
+- **Vì sao:** Nối T2+T3+T4 — hoàn tất đơn thì bóc phí + cộng ví seller (escrow release); hủy hoàn kho.
+- **Verify:** confirm/ship, transition sai 422, seller khác 403, received→phí+ví (seller_earning
+  427k vào available), hủy hoàn kho, không hủy sau ship — pass 6/6, đã xóa.
+- **File đụng:** Api/OrderController (mới), routes/api.php.
+

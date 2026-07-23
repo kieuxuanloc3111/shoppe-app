@@ -41,8 +41,8 @@ Sau phase này: có shop, sản phẩm đúng chuẩn, giỏ server, hết 4 l�
 
 ### P1 — Đơn hàng & lõi tiền  ☐
 - [x] `orders` / `shop_orders` / `order_items` — tách đơn theo shop  *(T1 schema + T2 checkout xong)*
-- [ ] Trừ tồn kho atomic trong transaction; state machine vòng đời đơn
-- [~] `seller_wallets` + `wallet_ledger` (sổ cái bất biến)  *(T1: bảng+model xong; service ở T4)*
+- [x] Trừ tồn kho atomic trong transaction (T2); state machine vòng đời đơn (T5)
+- [x] `seller_wallets` + `wallet_ledger` (sổ cái bất biến)  *(T4: WalletService xong)*
 - [x] Bộ máy hoa hồng/phí cấu hình được + `shop_order_fees`  *(T3: FeeCalculator xong; admin-edit fee = admin-track)*
 
 ### P2 — Thanh toán ký quỹ  ☐

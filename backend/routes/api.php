@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\CheckoutController;
 use App\Http\Controllers\Api\ShopController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CartController;
+use App\Http\Controllers\Api\OrderController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login',    [AuthController::class, 'login']);
@@ -43,6 +44,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/user/product/delete/{id}', [ProductController::class, 'deleteProduct']);
         Route::get('/user/product/{id}', [ProductController::class, 'getProduct']);
         Route::post('/user/product/update/{id}', [ProductController::class, 'updateProduct']);
+
+        // seller xem + xử lý đơn của shop mình
+        Route::get('/seller/orders', [OrderController::class, 'sellerOrders']);
+        Route::post('/seller/orders/{shopOrder}/confirm', [OrderController::class, 'confirm']);
+        Route::post('/seller/orders/{shopOrder}/ship', [OrderController::class, 'ship']);
     });
 
     // giỏ hàng server (buyer) — giá lấy từ DB, chặn vượt kho
@@ -50,6 +56,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/cart', [CartController::class, 'add']);
     Route::put('/cart/{item}', [CartController::class, 'update']);
     Route::delete('/cart/{item}', [CartController::class, 'remove']);
+
+    // buyer xem/thao tác đơn của mình
+    Route::get('/orders', [OrderController::class, 'myOrders']);
+    Route::get('/orders/{order}', [OrderController::class, 'show']);
+    Route::post('/orders/{shopOrder}/received', [OrderController::class, 'received']);
+    Route::post('/orders/{shopOrder}/cancel', [OrderController::class, 'cancel']);
 
     Route::post('/blog/comment/{id}', [BlogController::class,'storeComment']);
 });

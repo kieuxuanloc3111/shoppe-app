@@ -183,3 +183,85 @@ giỏ server · vá IDOR+leo-quyền · API Resources + /api/v1 · seeder admin.
 Tiếp theo: P1 (orders/shop_orders/order_items + ví + bộ máy phí). Nhớ: P1 dùng migration MỚI (alter),
 chỉ `php artisan migrate`, khỏi fresh.
 
+## 2026-07-18 — Ghi định hướng P5 (realtime) + P6 (AI) vào ROADMAP
+- **Làm gì:** Thêm P5 (chat/thông báo realtime — Reverb) và P6 (AI: recommendation, semantic
+  search, seller content-gen, fraud...) vào ROADMAP dưới mục "Định hướng tương lai — CHƯA làm".
+- **Vì sao:** User hỏi sao roadmap không có AI/realtime. Chúng là lớp trên nền commerce + cần
+  traffic/data → đánh dấu định hướng, làm sau P1–P4. Không làm giờ (YAGNI).
+- **File đụng:** ai-workspace/ROADMAP.md
+
+## 2026-07-18 — Lên plan P1 (đơn hàng & lõi tiền)
+- **Làm gì:** Chia P1 thành 6 task (schema đơn+tiền → checkout → phí → ví → state machine → query).
+  Chốt giả định: VNPay=P2 (P1 mark-paid tay), trừ kho lúc đặt, escrow, ship=0. Vá 3 bug P0 còn lại
+  ở T2 (giá từ DB, đơn thật, kho atomic). Export file plan.
+- **Vì sao:** Plan trước khi code (như P0).
+- **File đụng:** ai-workspace/plans/p1-orders-money-2026-07-18.md (mới)
+
+## 2026-07-18 — P1/T1: schema đơn + tiền (migrations + models)
+- **Làm gì:** 2 migration MỚI (bảng mới hết → chỉ `migrate`): orders/shop_orders/order_items;
+  fee_settings/shop_order_fees/seller_wallets/wallet_ledger. 7 model + quan hệ. order_items snapshot
+  name+unit_price; product_id/variant_id nullable nullOnDelete (giữ lịch sử đơn khi SP/variant bị
+  xóa/sửa). FeeSetting::current() (firstOrCreate 1 dòng). FK chỉ định rõ ('product_id','variant_id',
+  'buyer_id') do model số nhiều/khác tên.
+- **Vì sao:** Nền dữ liệu đơn + escrow + hoa hồng cho P1.
+- **Verify:** test order→shop_order→item, ví+ledger+fee, FeeSetting::current — pass 3/3, đã xóa.
+  (Fix: tạo lại tests/Unit/.gitkeep — phpunit cần thư mục.)
+- **File đụng:** 2 migration (orders, wallet+fee), 7 model (Order/ShopOrder/OrderItem/FeeSetting/
+  ShopOrderFee/SellerWallet/WalletLedger).
+- **Nợ:** T4 updateProduct hard-delete variants → order_items.variant_id thành null (snapshot vẫn
+  giữ). Sau nên soft-delete/không-xóa variant đã có đơn.
+
+## 2026-07-18 — P1/T2: checkout (đặt hàng) — VÁ 3 BUG P0 CÒN LẠI
+- **Làm gì:** Rewrite Api/CheckoutController. Từ giỏ server → trong DB transaction: khóa variant
+  (lockForUpdate) → kiểm+trừ kho atomic (chống oversell) → tạo order + tách shop_orders theo shop
+  + order_items (snapshot name+giá). **Giá lấy TỪ DB** (bỏ giá client). grand_total tính server.
+  Dọn giỏ. payment_status=pending (VNPay ở P2). Bỏ History/Mail cũ.
+- **Vì sao:** 3 bug P0 sống trong checkout: giá client (price-tampering), đơn giả (chỉ History),
+  không trừ kho. Giờ vá hết.
+- **Verify:** test tách-đơn-đa-shop + trừ kho, giá-từ-DB, oversell→422+rollback (kho không trừ,
+  đơn không tạo), giỏ trống→400 — pass 4/4, đã xóa.
+- **File đụng:** Api/CheckoutController (route /api/v1/checkout sẵn có).
+
+## 2026-07-18 — P1/T3: bộ máy phí (FeeCalculator)
+- **Làm gì:** Service `App\Services\FeeCalculator` bóc phí 1 shop_order: commission theo
+  category.commission_rate từng item + payment/tech (% trên subtotal) + infra (cố định) →
+  platform_total, seller_earning → ghi shop_order_fees (updateOrCreate). FeeSetting::current()
+  default Shopee VN (payment 5%, tech 5%, infra 3000đ). Admin-edit fee_settings = admin-track (skip).
+- **Vì sao:** Tính hoa hồng/phí sàn cho escrow (T5 gọi khi đơn completed).
+- **Verify:** test khớp ví dụ design doc (đơn 500k, hoa hồng 4% → seller 427k), gọi lại không
+  tạo trùng — pass 2/2, đã xóa.
+- **File đụng:** app/Services/FeeCalculator.php (mới), app/Models/FeeSetting.php.
+
+## 2026-07-18 — P1/T4: ví + sổ cái (WalletService)
+- **Làm gì:** Service `App\Services\WalletService`: apply(shop,type,amount,ref) cộng/trừ
+  `available` + ghi 1 dòng wallet_ledger (balance_after), khóa ví lockForUpdate chống race.
+  Tiện: creditSale (cộng khi completed), debitPayout (trừ khi rút). `pending` để dành escrow P2.
+- **Vì sao:** Số dư seller = sổ cái bút toán bất biến, đối soát được.
+- **Verify:** cộng dồn + balance_after đúng, rút trừ available (bút toán âm) — pass 2/2, đã xóa.
+- **File đụng:** app/Services/WalletService.php (mới).
+
+## 2026-07-18 — P1/T5: vòng đời đơn (state machine)
+- **Làm gì:** Api/OrderController: seller confirm (pending→confirmed), ship (confirmed→shipping);
+  buyer received (shipping→completed → FeeCalculator + WalletService.creditSale, trong transaction),
+  cancel (pending/confirmed → cancelled + hoàn kho). Guard: seller chỉ đơn shop mình, buyer chỉ đơn
+  mình; transition sai → 422. Routes: seller trong nhóm 'seller', buyer trong auth:sanctum.
+- **Vì sao:** Nối T2+T3+T4 — hoàn tất đơn thì bóc phí + cộng ví seller (escrow release); hủy hoàn kho.
+- **Verify:** confirm/ship, transition sai 422, seller khác 403, received→phí+ví (seller_earning
+  427k vào available), hủy hoàn kho, không hủy sau ship — pass 6/6, đã xóa.
+- **File đụng:** Api/OrderController (mới), routes/api.php.
+
+## 2026-07-18 — P1/T6: endpoint xem/quản đơn + Resources → P1 HOÀN TẤT
+- **Làm gì:** OrderController thêm myOrders (buyer, đơn mình), show (buyer, chi tiết, ownership),
+  sellerOrders (seller, shop_order của shop mình). Resources: OrderResource, ShopOrderResource
+  (items + fee + receiver whenLoaded), OrderItemResource. Routes GET /orders, /orders/{order},
+  /seller/orders.
+- **Vì sao:** Buyer/seller cần xem đơn; output curate nhất quán.
+- **Verify:** buyer chỉ thấy đơn mình + resource shape, buyer không xem đơn người khác (403),
+  seller chỉ thấy đơn shop mình — pass 3/3, đã xóa.
+- **File đụng:** Api/OrderController, 3 Resource mới, routes/api.php.
+
+## ✅ P1 HOÀN TẤT (T1–T6)
+Schema đơn+tiền · checkout (giá DB, trừ kho atomic, tách shop) · FeeCalculator · WalletService+ledger ·
+state machine (confirm/ship/received/cancel, completed→phí+ví, hủy→hoàn kho) · endpoint xem đơn.
+Vá xong cả 4 lỗi chặn P0. Tiếp: P2 (VNPay + escrow + payout).
+

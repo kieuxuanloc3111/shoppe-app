@@ -250,3 +250,18 @@ chỉ `php artisan migrate`, khỏi fresh.
   427k vào available), hủy hoàn kho, không hủy sau ship — pass 6/6, đã xóa.
 - **File đụng:** Api/OrderController (mới), routes/api.php.
 
+## 2026-07-18 — P1/T6: endpoint xem/quản đơn + Resources → P1 HOÀN TẤT
+- **Làm gì:** OrderController thêm myOrders (buyer, đơn mình), show (buyer, chi tiết, ownership),
+  sellerOrders (seller, shop_order của shop mình). Resources: OrderResource, ShopOrderResource
+  (items + fee + receiver whenLoaded), OrderItemResource. Routes GET /orders, /orders/{order},
+  /seller/orders.
+- **Vì sao:** Buyer/seller cần xem đơn; output curate nhất quán.
+- **Verify:** buyer chỉ thấy đơn mình + resource shape, buyer không xem đơn người khác (403),
+  seller chỉ thấy đơn shop mình — pass 3/3, đã xóa.
+- **File đụng:** Api/OrderController, 3 Resource mới, routes/api.php.
+
+## ✅ P1 HOÀN TẤT (T1–T6)
+Schema đơn+tiền · checkout (giá DB, trừ kho atomic, tách shop) · FeeCalculator · WalletService+ledger ·
+state machine (confirm/ship/received/cancel, completed→phí+ví, hủy→hoàn kho) · endpoint xem đơn.
+Vá xong cả 4 lỗi chặn P0. Tiếp: P2 (VNPay + escrow + payout).
+

@@ -3,14 +3,54 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Order;
 use App\Models\ProductVariant;
 use App\Models\ShopOrder;
+use App\Http\Resources\OrderResource;
+use App\Http\Resources\ShopOrderResource;
 use App\Services\FeeCalculator;
 use App\Services\WalletService;
 use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
+    /* ===== XEM ĐƠN ===== */
+
+    // buyer: đơn của mình
+    public function myOrders()
+    {
+        $orders = Order::where('buyer_id', auth()->id())
+            ->with(['shopOrders.items', 'shopOrders.fee'])
+            ->latest('id')
+            ->get();
+
+        return response()->json(['response' => 'success', 'data' => OrderResource::collection($orders)]);
+    }
+
+    // buyer: chi tiết 1 đơn của mình
+    public function show(Order $order)
+    {
+        if ($order->buyer_id !== auth()->id()) {
+            abort(403, 'Không phải đơn của bạn');
+        }
+        $order->load(['shopOrders.items', 'shopOrders.fee']);
+
+        return response()->json(['response' => 'success', 'data' => new OrderResource($order)]);
+    }
+
+    // seller: đơn của shop mình (nhiều buyer)
+    public function sellerOrders()
+    {
+        $shop = auth()->user()->shop;
+
+        $orders = ShopOrder::where('shop_id', $shop->id)
+            ->with(['items', 'fee', 'order'])
+            ->latest('id')
+            ->get();
+
+        return response()->json(['response' => 'success', 'data' => ShopOrderResource::collection($orders)]);
+    }
+
     /* ===== NGƯỜI BÁN ===== */
 
     public function confirm(ShopOrder $shopOrder)

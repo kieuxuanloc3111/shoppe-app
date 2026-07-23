@@ -39,7 +39,7 @@ Sau phase này: có shop, sản phẩm đúng chuẩn, giỏ server, hết 4 l�
 - [x] **Vá 4 lỗi chặn:** ~~IDOR (P0/T7)~~ · ~~giá từ DB · đơn thật · trừ kho atomic (P1/T2)~~ — XONG hết
 - [x] API Resources + `/api/v1` (envelope curate, ẩn field nhạy cảm)  *(T8 xong)*
 
-### P1 — Đơn hàng & lõi tiền  ☐
+### P1 — Đơn hàng & lõi tiền  ✅ XONG (2026-07-18)
 - [x] `orders` / `shop_orders` / `order_items` — tách đơn theo shop  *(T1 schema + T2 checkout xong)*
 - [x] Trừ tồn kho atomic trong transaction (T2); state machine vòng đời đơn (T5)
 - [x] `seller_wallets` + `wallet_ledger` (sổ cái bất biến)  *(T4: WalletService xong)*

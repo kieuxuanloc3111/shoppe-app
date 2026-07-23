@@ -45,7 +45,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/user/product/{id}', [ProductController::class, 'getProduct']);
         Route::post('/user/product/update/{id}', [ProductController::class, 'updateProduct']);
 
-        // seller xử lý đơn của shop mình
+        // seller xem + xử lý đơn của shop mình
+        Route::get('/seller/orders', [OrderController::class, 'sellerOrders']);
         Route::post('/seller/orders/{shopOrder}/confirm', [OrderController::class, 'confirm']);
         Route::post('/seller/orders/{shopOrder}/ship', [OrderController::class, 'ship']);
     });
@@ -56,7 +57,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/cart/{item}', [CartController::class, 'update']);
     Route::delete('/cart/{item}', [CartController::class, 'remove']);
 
-    // buyer thao tác đơn của mình
+    // buyer xem/thao tác đơn của mình
+    Route::get('/orders', [OrderController::class, 'myOrders']);
+    Route::get('/orders/{order}', [OrderController::class, 'show']);
     Route::post('/orders/{shopOrder}/received', [OrderController::class, 'received']);
     Route::post('/orders/{shopOrder}/cancel', [OrderController::class, 'cancel']);
 

@@ -25,6 +25,10 @@ Route::get('/advanced-search', [ProductController::class, 'advancedSearch']);
 Route::get('/filter-price',    [ProductController::class, 'filterPrice']);
 
 Route::get('/category-brand', [ProductController::class, 'categoryBrand']);
+// VNPay trả kết quả (công khai — VNPay gọi, buyer có thể chưa có token)
+Route::get('/payment/vnpay/return', [PaymentController::class, 'vnpayReturn']);
+Route::get('/payment/vnpay/ipn', [PaymentController::class, 'vnpayIpn']);
+
 // cây danh mục (công khai)
 Route::get('/categories', [CategoryController::class, 'index']);
 

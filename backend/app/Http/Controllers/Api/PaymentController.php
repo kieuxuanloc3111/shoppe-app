@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Payment;
+use App\Services\PaymentService;
 use App\Services\VnpayService;
 use Illuminate\Http\Request;
 
@@ -33,5 +34,23 @@ class PaymentController extends Controller
         $url = (new VnpayService())->createPaymentUrl($payment, $request->ip());
 
         return response()->json(['response' => 'success', 'pay_url' => $url]);
+    }
+
+    // VNPay redirect trình duyệt buyer về đây sau khi trả
+    public function vnpayReturn(Request $request)
+    {
+        $result = (new PaymentService())->handleVnpayCallback($request->query());
+
+        return response()->json([
+            'response' => $result['RspCode'] === '00' ? 'success' : 'error',
+            'paid'     => $result['RspCode'] === '00',
+            'message'  => $result['Message'],
+        ]);
+    }
+
+    // VNPay server gọi server (nguồn sự thật) — phải trả đúng format RspCode
+    public function vnpayIpn(Request $request)
+    {
+        return response()->json((new PaymentService())->handleVnpayCallback($request->query()));
     }
 }

@@ -63,6 +63,15 @@ class OrderController extends Controller
     public function ship(ShopOrder $shopOrder)
     {
         $this->authorizeSeller($shopOrder);
+
+        // VNPay: phải thanh toán trước mới cho giao (COD giao trước, trả khi nhận)
+        $order = $shopOrder->order;
+        if ($order->payment_method === 'vnpay' && $order->payment_status !== 'paid') {
+            abort(response()->json([
+                'response' => 'error', 'message' => 'Đơn VNPay chưa thanh toán, không thể giao',
+            ], 422));
+        }
+
         $this->transition($shopOrder, 'confirmed', 'shipping');
         return $this->ok($shopOrder);
     }

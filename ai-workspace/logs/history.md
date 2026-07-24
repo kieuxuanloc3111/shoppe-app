@@ -288,4 +288,27 @@ Vá xong cả 4 lỗi chặn P0. Tiếp: P2 (VNPay + escrow + payout).
 - **File đụng:** migration payments, Payment, config/vnpay.php, .env, VnpayService, PaymentController,
   routes/api.php.
 - **Cần user:** đăng ký VNPay sandbox điền VNP_TMN_CODE + VNP_HASH_SECRET để chạy thật.
+- **Update:** user đã đăng ký sandbox, creds cắm .env (TMN 4NQX747S). Link đúng: cổng
+  sandbox.vnpayment.vn/paymentv2/vpcpay.html, đăng ký /devreg/, admin /merchantv2/.
+
+## 2026-07-18 — P2/T2: callback/IPN VNPay → mark paid
+- **Làm gì:** PaymentService.handleVnpayCallback (dùng chung return+IPN): verify chữ ký → tìm
+  payment theo vnp_TxnRef → đối chiếu số tiền → idempotent (đã success = RspCode 02) → code 00
+  thì markPaid (payment success + order paid; T3 sẽ thêm fee+hold), khác thì failed. Trả RspCode
+  chuẩn VNPay. PaymentController: vnpayReturn (JSON cho buyer) + vnpayIpn (RspCode). Route public.
+- **Vì sao:** Nhận kết quả TT, nguồn sự thật là IPN.
+- **Verify:** mark paid, chữ ký sai 97, replay idempotent 02, sai tiền 04, TT thất bại không paid
+  — pass 5/5, đã xóa.
+- **File đụng:** PaymentService (mới), PaymentController, routes/api.php.
+- **IPN thật:** cần ngrok cho local (VNPay server gọi) — khai báo IPN URL ở merchantv2 khi test e2e.
+
+## 2026-07-18 — P2/T3: escrow lõi (hold + settleOrderPaid)
+- **Làm gì:** WalletService: `hold` (cộng pending), `release` (pending→available), mỗi cái ghi ledger.
+  PaymentService.settleOrderPaid(order) [dùng chung VNPay+COD]: idempotent (đã paid bỏ qua) → set
+  paid → mỗi shop_order FeeCalculator + hold(seller_earning vào pending). markPaid (VNPay) gọi
+  settleOrderPaid. OrderController.ship chặn: VNPay chưa paid → 422 (COD giao trước).
+- **Vì sao:** Escrow — sàn giữ tiền (pending) khi paid, nhả khi completed (T4).
+- **Verify:** paid→pending 427k + fee, idempotent, VNPay chưa paid chặn ship, paid ship được,
+  COD ship không cần paid — pass 5/5, đã xóa.
+- **File đụng:** WalletService, PaymentService, OrderController.
 

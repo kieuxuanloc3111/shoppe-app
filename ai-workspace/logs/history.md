@@ -265,3 +265,27 @@ Schema đơn+tiền · checkout (giá DB, trừ kho atomic, tách shop) · FeeCa
 state machine (confirm/ship/received/cancel, completed→phí+ví, hủy→hoàn kho) · endpoint xem đơn.
 Vá xong cả 4 lỗi chặn P0. Tiếp: P2 (VNPay + escrow + payout).
 
+## 2026-07-18 — Lên plan P2 (thanh toán ký quỹ)
+- **Làm gì:** Chia P2 thành 6 task (payments+VNPay URL → callback/IPN → escrow hold → release+COD
+  → refund → payout). Chốt giả định A-E (VNPay creds user cấp, refund nội bộ, COD đơn giản, chặn
+  ship khi chưa paid, escrow pending→available). Export file plan.
+- **Vì sao:** Plan trước khi code.
+- **File đụng:** ai-workspace/plans/p2-payment-escrow-2026-07-18.md (mới)
+- **Sửa plan:** User yêu cầu 2 kiểu TT như Shopee. COD thành first-class (không còn "đơn giản"):
+  COD tiền vẫn qua sàn (escrow), `paid` lúc seller xác nhận `delivered` (thay shipper). Hợp nhất
+  money model: sự kiện paid → phí+hold(pending); completed → release(available). State machine
+  thêm bước `delivered`. T3 = lõi markOrderPaid dùng chung cho VNPay(callback) + COD(delivered).
+
+## 2026-07-18 — P2/T1: payments + VnpayService (tạo URL)
+- **Làm gì:** Migration MỚI `payments`(order_id, gateway, amount, gateway_txn_id, status, raw json).
+  Payment model. config/vnpay.php + .env (VNP_TMN_CODE/HASH_SECRET/URL/RETURN_URL placeholder).
+  VnpayService: createPaymentUrl (sort param + HMAC-SHA512) + validSignature (verify callback).
+  Api/PaymentController@pay: buyer đơn vnpay chưa paid → tạo payment(pending) + trả pay_url.
+  Route POST /orders/{order}/pay.
+- **Vì sao:** Nền thanh toán online VNPay.
+- **Verify:** URL có chữ ký + verify roundtrip đúng, chữ ký sai từ chối, pay ra URL, COD 422,
+  đơn người khác 403 — pass 5/5, đã xóa.
+- **File đụng:** migration payments, Payment, config/vnpay.php, .env, VnpayService, PaymentController,
+  routes/api.php.
+- **Cần user:** đăng ký VNPay sandbox điền VNP_TMN_CODE + VNP_HASH_SECRET để chạy thật.
+

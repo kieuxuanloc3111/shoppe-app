@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\ShopController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\PaymentController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login',    [AuthController::class, 'login']);
@@ -62,6 +63,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/orders/{order}', [OrderController::class, 'show']);
     Route::post('/orders/{shopOrder}/received', [OrderController::class, 'received']);
     Route::post('/orders/{shopOrder}/cancel', [OrderController::class, 'cancel']);
+    Route::post('/orders/{order}/pay', [PaymentController::class, 'pay']); // VNPay: lấy URL redirect
 
     Route::post('/blog/comment/{id}', [BlogController::class,'storeComment']);
 });

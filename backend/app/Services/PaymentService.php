@@ -90,4 +90,14 @@ class PaymentService
         $fee = $shopOrder->fee ?: (new FeeCalculator())->calculate($shopOrder);
         (new WalletService())->release($shopOrder->shop_id, (float) $fee->seller_earning, 'shop_order', $shopOrder->id);
     }
+
+    // hoàn tiền 1 shop_order — đảo pending (khi hủy đơn đã giữ tiền). Buyer nhận lại tiền
+    // qua cổng = admin/VNPay tay (ngoài phạm vi). Chỉ khi đã hold (có fee).
+    public function refundShopOrder(ShopOrder $shopOrder): void
+    {
+        if (!$shopOrder->fee) {
+            return;
+        }
+        (new WalletService())->refundHold($shopOrder->shop_id, (float) $shopOrder->fee->seller_earning, 'shop_order', $shopOrder->id);
+    }
 }

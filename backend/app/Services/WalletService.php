@@ -78,6 +78,23 @@ class WalletService
         });
     }
 
+    // escrow: hoàn tiền — rút khỏi pending (đảo hold khi hủy đơn đã paid)
+    public function refundHold(int $shopId, float $amount, ?string $refType = null, ?int $refId = null): WalletLedger
+    {
+        $this->wallet($shopId);
+
+        return DB::transaction(function () use ($shopId, $amount, $refType, $refId) {
+            $wallet = SellerWallet::where('shop_id', $shopId)->lockForUpdate()->first();
+            $wallet->pending = round((float) $wallet->pending - $amount, 2);
+            $wallet->save();
+
+            return WalletLedger::create([
+                'shop_id' => $shopId, 'type' => 'refund', 'amount' => round(-$amount, 2),
+                'ref_type' => $refType, 'ref_id' => $refId, 'balance_after' => $wallet->available,
+            ]);
+        });
+    }
+
     // tiện ích: cộng thẳng available (dùng cho COD trước đây — giờ COD cũng escrow, xem PaymentService)
     public function creditSale(int $shopId, float $amount, int $shopOrderId): WalletLedger
     {

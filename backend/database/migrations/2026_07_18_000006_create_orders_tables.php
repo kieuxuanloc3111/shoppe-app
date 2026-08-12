@@ -17,7 +17,7 @@ return new class extends Migration {
             $table->string('receiver_address', 500);
 
             $table->decimal('grand_total', 15, 2);
-            $table->enum('payment_status', ['pending', 'paid', 'failed'])->default('pending');
+            $table->enum('payment_status', ['pending', 'paid', 'failed', 'refunded'])->default('pending');
             $table->string('payment_method')->nullable(); // cod / vnpay (P2)
             $table->timestamp('placed_at')->nullable();
             $table->timestamps();

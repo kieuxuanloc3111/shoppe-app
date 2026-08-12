@@ -124,6 +124,12 @@ class OrderController extends Controller
         }
 
         DB::transaction(function () use ($shopOrder) {
+            // nếu đã giữ tiền (VNPay trả trước) → hoàn: đảo pending + đánh dấu refunded
+            if ($shopOrder->fee) {
+                (new PaymentService())->refundShopOrder($shopOrder);
+                $shopOrder->order->update(['payment_status' => 'refunded']);
+            }
+
             foreach ($shopOrder->items as $item) {
                 if ($item->variant_id) {
                     ProductVariant::where('id', $item->variant_id)->increment('stock', $item->qty);

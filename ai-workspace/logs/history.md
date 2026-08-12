@@ -336,3 +336,15 @@ Vá xong cả 4 lỗi chặn P0. Tiếp: P2 (VNPay + escrow + payout).
 - **File đụng:** PaymentService, OrderController, routes/api.php; tests OrderLifecycle (rewrite) +
   EscrowRelease (mới).
 
+## 2026-07-18 — P2/T5: hoàn tiền (refund)
+- **Làm gì:** WalletService.refundHold (đảo pending, ledger 'refund'). PaymentService.refundShopOrder
+  (nếu đã hold → refundHold). OrderController.cancel: giữ guard [pending,confirmed] (không đụng
+  "không hủy sau ship"), thêm: nếu shop_order.fee (đã giữ tiền, VNPay trả trước) → refund + đánh
+  dấu order.payment_status='refunded'; COD pre-ship chưa hold → hủy thường. Hoàn kho như cũ.
+- **Vì sao:** Đơn VNPay đã trả mà hủy trước giao → phải hoàn tiền (đảo escrow).
+- **Bug test bắt:** enum payment_status thiếu 'refunded' → CHECK constraint fail → thêm vào
+  migration create_orders. **User cần migrate:fresh** (sửa create migration đã chạy).
+- **Verify:** VNPay đã trả hủy → pending đảo 0 + refunded + hoàn kho + ledger refund; COD chưa
+  hold hủy → thường (không refund). Full suite 77 pass.
+- **File đụng:** WalletService, PaymentService, OrderController, create_orders migration; test RefundTest (mới).
+

@@ -8,8 +8,7 @@ use App\Models\ProductVariant;
 use App\Models\ShopOrder;
 use App\Http\Resources\OrderResource;
 use App\Http\Resources\ShopOrderResource;
-use App\Services\FeeCalculator;
-use App\Services\WalletService;
+use App\Services\PaymentService;
 use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
@@ -76,28 +75,37 @@ class OrderController extends Controller
         return $this->ok($shopOrder);
     }
 
+    // seller/shipper xác nhận đã giao. COD: thu tiền lúc này → giữ tiền (escrow hold).
+    public function deliver(ShopOrder $shopOrder)
+    {
+        $this->authorizeSeller($shopOrder);
+        $this->transition($shopOrder, 'shipping', 'delivered');
+
+        // COD thu tiền khi giao; VNPay đã hold từ callback
+        if ($shopOrder->order->payment_method === 'cod') {
+            (new PaymentService())->holdShopOrder($shopOrder);
+        }
+
+        return $this->ok($shopOrder);
+    }
+
     /* ===== NGƯỜI MUA ===== */
 
-    // xác nhận đã nhận → completed → bóc phí + cộng ví người bán (escrow release)
+    // xác nhận đã nhận → completed → nhả tiền pending → available (escrow release)
     public function received(ShopOrder $shopOrder)
     {
         $this->authorizeBuyer($shopOrder);
 
-        if ($shopOrder->status !== 'shipping') {
+        if ($shopOrder->status !== 'delivered') {
             abort(response()->json([
                 'response' => 'error',
-                'message'  => "Không thể xác nhận nhận hàng khi đơn đang '{$shopOrder->status}'",
+                'message'  => "Chưa thể xác nhận nhận hàng khi đơn đang '{$shopOrder->status}'",
             ], 422));
         }
 
         DB::transaction(function () use ($shopOrder) {
             $shopOrder->update(['status' => 'completed']);
-            $fee = (new FeeCalculator())->calculate($shopOrder);
-            (new WalletService())->creditSale(
-                $shopOrder->shop_id,
-                (float) $fee->seller_earning,
-                $shopOrder->id
-            );
+            (new PaymentService())->releaseShopOrder($shopOrder);
         });
 
         return $this->ok($shopOrder);

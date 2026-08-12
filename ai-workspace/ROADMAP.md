@@ -46,9 +46,9 @@ Sau phase này: có shop, sản phẩm đúng chuẩn, giỏ server, hết 4 l�
 - [x] Bộ máy hoa hồng/phí cấu hình được + `shop_order_fees`  *(T3: FeeCalculator xong; admin-edit fee = admin-track)*
 
 ### P2 — Thanh toán ký quỹ  ☐
-- [ ] Tích hợp VNPay (redirect + verify callback/IPN chữ ký)
-- [ ] Escrow: giữ pending → nhả available khi hoàn tất
-- [ ] Hoàn tiền + luồng payout + admin duyệt
+- [x] Tích hợp VNPay (redirect + verify callback/IPN chữ ký)  *(T1+T2)*
+- [x] Escrow: giữ pending → nhả available khi hoàn tất  *(T3 hold + T4 release; COD+VNPay)*
+- [ ] Hoàn tiền + luồng payout + admin duyệt  *(T5+T6)*
 
 ### P3 — Tính năng sàn  ☐
 - [ ] Đánh giá sản phẩm (verified purchase) → cập nhật rating

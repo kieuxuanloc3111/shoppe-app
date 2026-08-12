@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Order;
 use App\Models\Payment;
+use App\Models\ShopOrder;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -70,14 +71,23 @@ class PaymentService
 
         DB::transaction(function () use ($order) {
             $order->update(['payment_status' => 'paid']);
-
-            $fee = new FeeCalculator();
-            $wallet = new WalletService();
-
             foreach ($order->shopOrders as $shopOrder) {
-                $f = $fee->calculate($shopOrder);
-                $wallet->hold($shopOrder->shop_id, (float) $f->seller_earning, 'shop_order', $shopOrder->id);
+                $this->holdShopOrder($shopOrder);
             }
         });
+    }
+
+    // giữ tiền 1 shop_order vào pending (tính phí trước). Idempotency do caller/state machine chốt.
+    public function holdShopOrder(ShopOrder $shopOrder): void
+    {
+        $fee = (new FeeCalculator())->calculate($shopOrder);
+        (new WalletService())->hold($shopOrder->shop_id, (float) $fee->seller_earning, 'shop_order', $shopOrder->id);
+    }
+
+    // nhả tiền 1 shop_order pending → available (khi buyer nhận)
+    public function releaseShopOrder(ShopOrder $shopOrder): void
+    {
+        $fee = $shopOrder->fee ?: (new FeeCalculator())->calculate($shopOrder);
+        (new WalletService())->release($shopOrder->shop_id, (float) $fee->seller_earning, 'shop_order', $shopOrder->id);
     }
 }

@@ -54,6 +54,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/seller/orders', [OrderController::class, 'sellerOrders']);
         Route::post('/seller/orders/{shopOrder}/confirm', [OrderController::class, 'confirm']);
         Route::post('/seller/orders/{shopOrder}/ship', [OrderController::class, 'ship']);
+        Route::post('/seller/orders/{shopOrder}/deliver', [OrderController::class, 'deliver']);
     });
 
     // giỏ hàng server (buyer) — giá lấy từ DB, chặn vượt kho

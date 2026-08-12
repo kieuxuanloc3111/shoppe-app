@@ -312,3 +312,27 @@ Vá xong cả 4 lỗi chặn P0. Tiếp: P2 (VNPay + escrow + payout).
   COD ship không cần paid — pass 5/5, đã xóa.
 - **File đụng:** WalletService, PaymentService, OrderController.
 
+## 2026-07-18 — Đổi rule test + backfill 14 file test
+- **Làm gì:** Rule đổi: code xong → VIẾT test ở tests/Feature + GIỮ (không xóa nữa), cover hết
+  nhánh lỗi. Dựng lại 14 file test đã xóa (P0-P2): Shop, ProfileSecurity, Category, ProductCatalog,
+  Cart, OrderSchema, Checkout, FeeCalculator, WalletService, OrderLifecycle, OrderQuery, VnpayCreate,
+  VnpayCallback, EscrowHold. Full suite: 73 pass, 148 assertions.
+- **Vì sao:** User muốn có lưới regression (money code không thể chạy trần).
+- **File đụng:** tests/Feature/*.php (14 file), CLAUDE.md #7.
+- **Lưu ý:** OrderLifecycleTest.received hiện test credit thẳng (P1 behavior) — T4 sẽ đổi sang
+  escrow release, cập nhật test đó khi làm T4.
+
+## 2026-07-18 — P2/T4: deliver + received release + COD escrow
+- **Làm gì:** State machine thêm `deliver` (shipping→delivered, seller). COD: deliver → holdShopOrder
+  (thu tiền khi giao, per shop_order). `received` đổi: delivered→completed → releaseShopOrder
+  (pending→available), thay logic credit-thẳng của P1. PaymentService tách holdShopOrder +
+  releaseShopOrder; settleOrderPaid (VNPay) dùng holdShopOrder. OrderController bỏ import
+  FeeCalculator/WalletService, dùng PaymentService.
+  - Assumption: COD "paid" per-shop_order (shipper thu từng gói); VNPay paid cả đơn upfront.
+    Idempotency = chốt transition (mỗi bước 1 lần).
+- **Vì sao:** Hợp nhất escrow — cả VNPay lẫn COD: paid→hold pending, received→release available.
+- **Verify:** luồng đầy đủ confirm→ship→deliver→received; COD deliver giữ pending→received nhả
+  available; VNPay không hold 2 lần; received trước delivered 422; guards. Full suite 75 pass.
+- **File đụng:** PaymentService, OrderController, routes/api.php; tests OrderLifecycle (rewrite) +
+  EscrowRelease (mới).
+

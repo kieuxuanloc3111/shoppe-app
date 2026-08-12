@@ -46,8 +46,11 @@ ai-workspace/
    Ngoại lệ: AI được chạy lệnh để TỰ KIỂM TRA / debug / lint khi đang code (VD `php -l`,
    đọc schema, chạy test để fix lỗi). Không chạy lệnh làm đổi trạng thái project của người dùng.
 
-7. **Test là công cụ dùng-một-lần.** Viết test verify task → chạy `php artisan test` cho pass
-   → XÓA file test. Không giữ lại (repo nhẹ). AI tự chạy test để verify trước khi xóa.
+7. **Code xong việc gì → VIẾT test ở `tests/Feature/` và GIỮ LẠI.** Không xóa.
+   Cover TẤT CẢ lỗi có thể: happy path + mọi nhánh lỗi (validate, quyền/403, không tìm thấy/404,
+   trạng thái sai/422, race, idempotent, ownership...). AI tự chạy `php artisan test` cho pass
+   trước khi báo xong. Test là lưới an toàn regression, phải tồn tại.
+   (Quy tắc cũ "xóa test sau khi pass" ĐÃ BỎ.)
 
 8. **Migration:** nếu SỬA/ĐỔI TÊN create-migration đã chạy → người dùng phải `migrate:fresh`
    (xóa data, chạy lại từ đầu). Chỉ `migrate` khi THÊM migration mới hoàn toàn.
